@@ -33,7 +33,7 @@ def main():
     st.sidebar.header('User Input parameter')
     
     st.sidebar.markdown("""
-    [Example CSV Input File](https://github.com/Gellstan/Singapore-House-Resale-Price-Prediction.git)                    
+    [Example CSV Input File](https://raw.githubusercontent.com/Gellstan/Singapore-House-Resale-Price-Prediction/main/main/sample_input_data.csv)                    
     """)
     
     uploaded_file = st.sidebar.file_uploader("Upload your input CSV file", type=["csv"])
