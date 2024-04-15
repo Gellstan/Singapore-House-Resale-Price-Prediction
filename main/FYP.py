@@ -10,7 +10,7 @@ import numpy as np
 # arima_model = pickle.load(open("ARIMA_model.pkl", "rb"))
 # prophet_model = pickle.load(open("Prophet_model.pkl", "rb"))
 
-feature_var = json.load(open("columns_unique.json"))
+feature_var = json.load(open("main/columns_unique.json"))
 data_columns = feature_var['data_columns']
 townlist = data_columns['town']
 monthlist = data_columns['month']
