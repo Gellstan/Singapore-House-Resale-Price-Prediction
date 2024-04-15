@@ -33,7 +33,7 @@ def main():
     st.sidebar.header('User Input parameter')
     
     st.sidebar.markdown("""
-    [Example CSV Input File](the link of github)                    
+    [Example CSV Input File](https://github.com/Gellstan/Singapore-House-Resale-Price-Prediction.git)                    
     """)
     
     uploaded_file = st.sidebar.file_uploader("Upload your input CSV file", type=["csv"])
@@ -55,7 +55,7 @@ def main():
             have_public_transit = 1 if have_public_transit_res == 'Yes' else 0
             
             floor_area_sqm = st.sidebar.slider('Floor Area(sqm)', 28, 307, 95)
-            lease_commence_date = st.sidebar.slider('Lease Commence Date', 1966, 2019, 1987)
+            lease_commence_date = st.sidebar.slider('Lease Commence Date', 1966, 2019, 1986)
             resale_price = st.sidebar.slider('Resale Price', 5000, 1500000, 275000)
             year_population	= st.sidebar.slider('Year Population', 3000000, 6000000, 4250000)
             
