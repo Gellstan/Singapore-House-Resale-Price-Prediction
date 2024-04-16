@@ -40,14 +40,25 @@ def preprocess_data(input_df):
     
     return input_df
 
-
-
 def arima_predict(input_df):
-    input_series = input_df['resale_price']
-    input_series.index = pd.to_datetime(input_df['month'])  # Ensure the index is datetime type
+    # Check if 'month' is a column, convert it to datetime, and set it as the index
+    if 'month' in input_df.columns:
+        input_df['month'] = pd.to_datetime(input_df['month'], errors='coerce')
+        input_df.set_index('month', inplace=True)
+    
+    # Extract the 'resale_price' series
+    if 'resale_price' in input_df.columns:
+        input_series = input_df['resale_price']
+    else:
+        raise ValueError("resale_price column is missing from the input DataFrame.")
 
-    # Perform prediction
-    arima_prediction = arima_model.predict(start=input_series.index[0], end=input_series.index[-1])
+    # Ensure that the index is properly formatted as datetime
+    if not isinstance(input_series.index, pd.DatetimeIndex):
+        raise TypeError("Index is not a datetime type, which is required for ARIMA predictions.")
+
+    # Perform prediction using the ARIMA model
+    start, end = input_series.index[0], input_series.index[-1]
+    arima_prediction = arima_model.predict(start=start, end=end)
     return arima_prediction
     
 def lstm_predict(input_df):
