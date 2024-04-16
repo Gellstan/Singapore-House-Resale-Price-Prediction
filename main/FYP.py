@@ -15,7 +15,6 @@ label_encoders_flat_type = pickle.load(open('main/Label_Encoder_Flat_Type.pkl', 
 label_encoders_storey_range = pickle.load(open('main/Label_Encoder_Storey_Range.pkl', 'rb'))
 minmax_scaler = pickle.load(open('main/Scaler.pkl', 'rb'))
 
-
 feature_var = json.load(open("main/columns_unique.json"))
 data_columns = feature_var['data_columns']
 townlist = data_columns['town']
@@ -25,8 +24,6 @@ blocklist = data_columns['block']
 street_namelist = data_columns['street_name']
 storey_rangelist = data_columns['storey_range']
 flat_modellist = data_columns['flat_model']
-
-
 
 def preprocess_data(input_df):  
     # One-hot encode categorical columns
