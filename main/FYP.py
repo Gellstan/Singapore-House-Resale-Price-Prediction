@@ -20,7 +20,17 @@ street_namelist = data_columns['street_name']
 storey_rangelist = data_columns['storey_range']
 flat_modellist = data_columns['flat_model']
 
-
+def arima_predict(input_df):
+    arima_prediction = arima_model.predict(input_df)
+    return arima_prediction
+    
+def lstm_predict(input_df):
+    lstm_prediction = lstm_model.predict(input_df)
+    return lstm_prediction
+    
+def prophet_predict(input_df):
+    prophet_prediction = prophet_model.predict(input_df)
+    return prophet_prediction
 
 def main():
     st.write("""
@@ -79,7 +89,22 @@ def main():
 
     st.subheader('User Input parameters')
     st.write(input_df)
-
-
+    st.write('---')
+    
+    arima_prediction = arima_predict(input_df)
+    lstm_prediction = lstm_predict(input_df)
+    prophet_prediction = prophet_predict(input_df)
+    
+    st.subheader('ARIMA Prediction')
+    st.write(arima_prediction)
+    st.write('---')
+    
+    st.subheader('LSTM Prediction')
+    st.write(lstm_prediction)
+    st.write('---')
+    
+    st.subheader('Prophet Prediction')
+    st.write(prophet_prediction)
+    st.write('---')
 
 main()
