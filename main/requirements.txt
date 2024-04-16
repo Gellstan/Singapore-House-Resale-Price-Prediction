@@ -1,5 +1,2 @@
 streamlit
-pandas
-tensorflow == 2.6.0
-json
-numpy
+tensorflow
