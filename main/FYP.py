@@ -4,6 +4,8 @@ import pickle
 from tensorflow.keras.models import load_model # type: ignore
 import json
 import numpy as np
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
 
 
 lstm_model = load_model('main/LSTM_model.h5')
@@ -19,6 +21,39 @@ blocklist = data_columns['block']
 street_namelist = data_columns['street_name']
 storey_rangelist = data_columns['storey_range']
 flat_modellist = data_columns['flat_model']
+
+def load_transformers():
+    with open('label_encoders.pkl', 'rb') as file:
+        label_encoders = pickle.load(file)
+    with open('minmax_scaler.pkl', 'rb') as file:
+        minmax_scaler = pickle.load(file)
+    return label_encoders, minmax_scaler
+
+def preprocess_data(input_df):
+    label_encoders, minmax_scaler = load_transformers()
+    
+    # One-hot encode categorical columns
+    categorical_cols = ['town', 'block', 'street_name', 'flat_model']
+    input_df = pd.get_dummies(input_df, columns=categorical_cols, sparse=True)
+    
+    # Label encode other categorical columns
+    for col in ['flat_type', 'storey_range']:
+        input_df[col + '_encoded'] = label_encoders[col].transform(input_df[col])
+    
+    # Normalize numerical columns
+    numerical_cols = ['floor_area_sqm', 'lease_commence_date', 'resale_price', 'year_population']
+    input_df[numerical_cols] = minmax_scaler.transform(input_df[numerical_cols])
+    
+    return input_df
+
+# Example usage in Streamlit
+import streamlit as st
+input_data = st.file_uploader("Upload your data", type=["csv"])
+if input_data is not None:
+    input_df = pd.read_csv(input_data)
+    preprocessed_data = preprocess_data(input_df)
+    st.write("Preprocessed Data:", preprocessed_data)
+
 
 def arima_predict(input_df):
     arima_prediction = arima_model.predict(input_df)
@@ -91,9 +126,10 @@ def main():
     st.write(input_df)
     st.write('---')
     
-    arima_prediction = arima_predict(input_df)
-    lstm_prediction = lstm_predict(input_df)
-    prophet_prediction = prophet_predict(input_df)
+    processed_input_df = preprocess_data(input_df)
+    arima_prediction = arima_predict(processed_input_df)
+    lstm_prediction = lstm_predict(processed_input_df)
+    prophet_prediction = prophet_predict(processed_input_df)
     
     st.subheader('ARIMA Prediction')
     st.write(arima_prediction)
