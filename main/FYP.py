@@ -56,7 +56,7 @@ def arima_predict(input_df):
         raise TypeError("Index is not a datetime type, which is required for ARIMA predictions.")
 
     # Perform prediction using the ARIMA model
-    start, end = input_series.index[0], input_series.index[-1]
+    start, end = input_series.index[0], '2030-12'
     arima_prediction = arima_model.predict(start=start, end=end)
     return arima_prediction
     
