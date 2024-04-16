@@ -51,7 +51,7 @@ def main():
         input_df = pd.read_csv(uploaded_file)
     else:
         def user_input_features():
-            # month = st.sidebar.selectbox('Town', monthlist)
+            month = st.sidebar.select_slider('Month', monthlist)
             town = st.sidebar.selectbox('Town', townlist)
             flat_type = st.sidebar.selectbox('Flat Type', flat_typelist) 
             block = st.sidebar.selectbox('Block', blocklist)
@@ -70,7 +70,7 @@ def main():
             year_population	= st.sidebar.slider('Year Population', 3000000, 6000000, 4250000)
             
             data = {
-                # 'month' : month,
+                'month' : month,
                 'town' : town,
                 'flat_type'	: flat_type,
                 'block'	: block,
