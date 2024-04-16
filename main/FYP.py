@@ -11,6 +11,8 @@ from sklearn.compose import ColumnTransformer
 lstm_model = load_model('main/LSTM_model.h5')
 arima_model = pickle.load(open("main/ARIMA_model.pkl", "rb"))
 prophet_model = pickle.load(open("main/Prophet_model.pkl", "rb"))
+label_encoders = pickle.load(open('main/Label_Encoder.pkl', 'rb'))
+minmax_scaler = pickle.load(open('main/Scaler.pkl', 'rb'))
 
 feature_var = json.load(open("main/columns_unique.json"))
 data_columns = feature_var['data_columns']
@@ -22,17 +24,9 @@ street_namelist = data_columns['street_name']
 storey_rangelist = data_columns['storey_range']
 flat_modellist = data_columns['flat_model']
 
-def load_transformers():
-    with open('main/Label_Encoder.pkl', 'rb') as file:
-        label_encoders = pickle.load(file)
-        print(label_encoders.keys())
-    with open('main/Scaler.pkl', 'rb') as file:
-        minmax_scaler = pickle.load(file)
-    return label_encoders, minmax_scaler
 
-def preprocess_data(input_df):
-    label_encoders, minmax_scaler = load_transformers()
-    
+
+def preprocess_data(input_df):  
     # One-hot encode categorical columns
     categorical_cols = ['town', 'block', 'street_name', 'flat_model']
     input_df = pd.get_dummies(input_df, columns=categorical_cols, sparse=True)
