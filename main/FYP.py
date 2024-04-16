@@ -20,21 +20,29 @@ street_namelist = data_columns['street_name']
 storey_rangelist = data_columns['storey_range']
 flat_modellist = data_columns['flat_model']
 
-# Sample validation before calling predict
 def arima_predict(input_df, arima_model):
-    start_date = input_df.index[0]
-    end_date = input_df.index[-1]
+    # Ensure index is in datetime format
+    input_df.index = pd.to_datetime(input_df.index)
 
-    # Check if the dates are within the model's training data range
-    trained_start, trained_end = arima_model.data.row_labels[0], arima_model.data.row_labels[-1]
+    start_date = pd.to_datetime(input_df.index[0])
+    end_date = pd.to_datetime(input_df.index[-1])
+
+    trained_start = pd.to_datetime(arima_model.data.row_labels[0])
+    trained_end = pd.to_datetime(arima_model.data.row_labels[-1])
+
+    if start_date is None or end_date is None:
+        start_date = trained_start
+        end_date = trained_end
+
     if not (trained_start <= start_date <= trained_end and trained_start <= end_date <= trained_end):
-        print("Date out of range. Adjusting...")
+        # Handle date out of range
         start_date = max(start_date, trained_start)
         end_date = min(end_date, trained_end)
 
-    # Predict using ARIMA model
+    # Proceed with prediction
     arima_prediction = arima_model.predict(start=start_date, end=end_date)
     return arima_prediction
+
 
     
 def lstm_predict(input_df):
