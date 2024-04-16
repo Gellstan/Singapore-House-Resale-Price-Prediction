@@ -98,7 +98,7 @@ def main():
     st.write(input_df)
     st.write('---')
     
-    arima_prediction = arima_predict(input_df)
+    arima_prediction = arima_predict(input_df, arima_model)
     lstm_prediction = lstm_predict(input_df)
     prophet_prediction = prophet_predict(input_df)
     
