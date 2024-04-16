@@ -1,14 +1,14 @@
 import streamlit as st
 import pandas as pd
 import pickle
-# from tensorflow.keras.models import load_model
+from tensorflow.keras.models import load_model
 import json
 import numpy as np
 
 
-# lstm_model = load_model('LSTM_model.h5')
-# arima_model = pickle.load(open("ARIMA_model.pkl", "rb"))
-# prophet_model = pickle.load(open("Prophet_model.pkl", "rb"))
+lstm_model = load_model('main/LSTM_model.h5')
+arima_model = pickle.load(open("main/ARIMA_model.pkl", "rb"))
+prophet_model = pickle.load(open("main/Prophet_model.pkl", "rb"))
 
 feature_var = json.load(open("main/columns_unique.json"))
 data_columns = feature_var['data_columns']
