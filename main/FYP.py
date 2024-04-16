@@ -43,7 +43,11 @@ def preprocess_data(input_df):
 
 
 def arima_predict(input_df):
-    arima_prediction = arima_model.predict(input_df)
+    input_series = input_df['resale_price']
+    input_series.index = pd.to_datetime(input_df['month'])  # Ensure the index is datetime type
+
+    # Perform prediction
+    arima_prediction = arima_model.predict(start=input_series.index[0], end=input_series.index[-1])
     return arima_prediction
     
 def lstm_predict(input_df):
@@ -94,7 +98,6 @@ def main():
             year_population	= st.sidebar.slider('Year Population', 3000000, 6000000, 4250000)
             
             data = {
-                'month' : month,
                 'town': town,
                 'flat_type': flat_type,
                 'block': block,
@@ -108,7 +111,7 @@ def main():
                 'have_school': int(have_school == 'Yes'),
                 'have_public_transit': int(have_public_transit == 'Yes')
             }
-            features = pd.DataFrame(data, index=[0])
+            features = pd.DataFrame(data, index=[month])
             return features
         input_df = user_input_features()
 
