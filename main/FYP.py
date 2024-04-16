@@ -11,7 +11,8 @@ from sklearn.compose import ColumnTransformer
 lstm_model = load_model('main/LSTM_model.h5')
 arima_model = pickle.load(open("main/ARIMA_model.pkl", "rb"))
 prophet_model = pickle.load(open("main/Prophet_model.pkl", "rb"))
-label_encoders = pickle.load(open('main/Label_Encoder.pkl', 'rb'))
+label_encoders_flat_type = pickle.load(open('main/Label_Encoder_Flat_Type.pkl', 'rb'))
+label_encoders_storey_range = pickle.load(open('main/Label_Encoder_Storey_Range.pkl', 'rb'))
 minmax_scaler = pickle.load(open('main/Scaler.pkl', 'rb'))
 
 
@@ -33,21 +34,12 @@ def preprocess_data(input_df):
     input_df = pd.get_dummies(input_df, columns=categorical_cols, sparse=True)
     
     # Label encode other categorical columns
-    for col in ['flat_type', 'storey_range']:
-        if col in input_df:
-            input_df[col + '_encoded'] = label_encoders[col].transform(input_df[col])
-        else:
-            st.error(f"Missing column: {col}")
-            return None  # Handle missing column case
-    
+    input_df['flat_type_encoded'] = label_encoders_flat_type.transform(input_df['flat_type'])
+    input_df['storey_range_encoded'] = label_encoders_storey_range.transform(input_df['storey_range'])
+
     # Normalize numerical columns
     numerical_cols = ['floor_area_sqm', 'lease_commence_date', 'resale_price', 'year_population']
-    if all(column in input_df.columns for column in numerical_cols):
-        input_df[numerical_cols] = minmax_scaler.transform(input_df[numerical_cols])
-    else:
-        missing_cols = [col for col in numerical_cols if col not in input_df.columns]
-        st.error(f"Missing numerical columns: {missing_cols}")
-        return None  # Handle missing columns case
+    input_df[numerical_cols] = minmax_scaler.transform(input_df[numerical_cols])
     
     return input_df
 
