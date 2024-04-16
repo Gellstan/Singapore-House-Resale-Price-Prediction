@@ -20,8 +20,15 @@ street_namelist = data_columns['street_name']
 storey_rangelist = data_columns['storey_range']
 flat_modellist = data_columns['flat_model']
 
-def arima_predict(input_df):
-    arima_prediction = arima_model.predict(input_df)
+def arima_predict(input_df, arima_model):
+    # Ensure the index is in datetime format
+    input_df.index = pd.to_datetime(input_df.index)
+    
+    # Optionally, check if the index has been converted correctly
+    print(input_df.index)
+
+    # Predict using ARIMA model
+    arima_prediction = arima_model.predict(start=input_df.index[0], end=input_df.index[-1])
     return arima_prediction
     
 def lstm_predict(input_df):
