@@ -133,17 +133,16 @@ def main():
     
     processed_input_df = preprocess_data(input_df)
     arima_prediction = arima_predict(processed_input_df)
-    lstm_prediction = lstm_predict(processed_input_df)
-    prophet_prediction = prophet_predict(processed_input_df)
-    
     st.subheader('ARIMA Prediction')
     st.write(arima_prediction)
     st.write('---')
     
+    lstm_prediction = lstm_predict(processed_input_df)
     st.subheader('LSTM Prediction')
     st.write(lstm_prediction)
     st.write('---')
     
+    prophet_prediction = prophet_predict(processed_input_df)
     st.subheader('Prophet Prediction')
     st.write(prophet_prediction)
     st.write('---')
