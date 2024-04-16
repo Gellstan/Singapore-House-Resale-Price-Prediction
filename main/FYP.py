@@ -28,7 +28,7 @@ def arima_predict(input_df, arima_model):
     print(input_df.index)
 
     # Predict using ARIMA model
-    arima_prediction = arima_model.predict(start=input_df.index[0], end=input_df.index[-1])
+    arima_prediction = arima_model.predict(start=input_df.index[0], end=2030-12-31)
     return arima_prediction
     
 def lstm_predict(input_df):
