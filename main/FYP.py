@@ -94,6 +94,7 @@ def main():
             year_population	= st.sidebar.slider('Year Population', 3000000, 6000000, 4250000)
             
             data = {
+                'month' : month,
                 'town': town,
                 'flat_type': flat_type,
                 'block': block,
@@ -107,7 +108,7 @@ def main():
                 'have_school': int(have_school == 'Yes'),
                 'have_public_transit': int(have_public_transit == 'Yes')
             }
-            features = pd.DataFrame(data, index=[month])
+            features = pd.DataFrame(data, index=[0])
             return features
         input_df = user_input_features()
 
