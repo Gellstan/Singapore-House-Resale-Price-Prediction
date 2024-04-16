@@ -14,6 +14,7 @@ prophet_model = pickle.load(open("main/Prophet_model.pkl", "rb"))
 label_encoders = pickle.load(open('main/Label_Encoder.pkl', 'rb'))
 minmax_scaler = pickle.load(open('main/Scaler.pkl', 'rb'))
 
+
 feature_var = json.load(open("main/columns_unique.json"))
 data_columns = feature_var['data_columns']
 townlist = data_columns['town']
