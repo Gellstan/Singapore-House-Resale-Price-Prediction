@@ -46,14 +46,6 @@ def preprocess_data(input_df):
     
     return input_df
 
-# Example usage in Streamlit
-import streamlit as st
-input_data = st.file_uploader("Upload your data", type=["csv"])
-if input_data is not None:
-    input_df = pd.read_csv(input_data)
-    preprocessed_data = preprocess_data(input_df)
-    st.write("Preprocessed Data:", preprocessed_data)
-
 
 def arima_predict(input_df):
     arima_prediction = arima_model.predict(input_df)
@@ -83,7 +75,9 @@ def main():
     
     uploaded_file = st.sidebar.file_uploader("Upload your input CSV file", type=["csv"])
     if uploaded_file is not None:
-        input_df = pd.read_csv(uploaded_file)
+        input_data = st.file_uploader("Upload your data", type=["csv"])
+        if input_data is not None:
+            input_df = pd.read_csv(input_data)
     else:
         def user_input_features():
             month = st.sidebar.select_slider('Month', monthlist)
