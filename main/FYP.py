@@ -23,9 +23,9 @@ storey_rangelist = data_columns['storey_range']
 flat_modellist = data_columns['flat_model']
 
 def load_transformers():
-    with open('label_encoders.pkl', 'rb') as file:
+    with open('main/label_encoders.pkl', 'rb') as file:
         label_encoders = pickle.load(file)
-    with open('minmax_scaler.pkl', 'rb') as file:
+    with open('main/minmax_scaler.pkl', 'rb') as file:
         minmax_scaler = pickle.load(file)
     return label_encoders, minmax_scaler
 
