@@ -43,7 +43,6 @@ def preprocess_data(input_df):
 def arima_predict(input_df):
     # Check if 'month' is a column, convert it to datetime, and set it as the index
     if 'month' in input_df.columns:
-        input_df['month'] = pd.to_datetime(input_df['month'], errors='coerce')
         input_df.set_index('month', inplace=True)
     
     # Extract the 'resale_price' series
@@ -109,6 +108,7 @@ def main():
             year_population	= st.sidebar.slider('Year Population', 3000000, 6000000, 4250000)
             
             data = {
+                'month' : month,
                 'town': town,
                 'flat_type': flat_type,
                 'block': block,
@@ -122,7 +122,8 @@ def main():
                 'have_school': int(have_school == 'Yes'),
                 'have_public_transit': int(have_public_transit == 'Yes')
             }
-            features = pd.DataFrame(data, index=[month])
+            features = pd.DataFrame(data, index=[0])
+            features['month'] = pd.to_datetime(features['month'], errors='coerce')
             return features
         input_df = user_input_features()
 
