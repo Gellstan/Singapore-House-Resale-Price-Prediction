@@ -25,6 +25,7 @@ flat_modellist = data_columns['flat_model']
 def load_transformers():
     with open('main/Label_Encoder.pkl', 'rb') as file:
         label_encoders = pickle.load(file)
+        print(label_encoders.keys())
     with open('main/Scaler.pkl', 'rb') as file:
         minmax_scaler = pickle.load(file)
     return label_encoders, minmax_scaler
@@ -38,13 +39,23 @@ def preprocess_data(input_df):
     
     # Label encode other categorical columns
     for col in ['flat_type', 'storey_range']:
-        input_df[col + '_encoded'] = label_encoders[col].transform(input_df[col])
+        if col in input_df:
+            input_df[col + '_encoded'] = label_encoders[col].transform(input_df[col])
+        else:
+            st.error(f"Missing column: {col}")
+            return None  # Handle missing column case
     
     # Normalize numerical columns
     numerical_cols = ['floor_area_sqm', 'lease_commence_date', 'resale_price', 'year_population']
-    input_df[numerical_cols] = minmax_scaler.transform(input_df[numerical_cols])
+    if all(column in input_df.columns for column in numerical_cols):
+        input_df[numerical_cols] = minmax_scaler.transform(input_df[numerical_cols])
+    else:
+        missing_cols = [col for col in numerical_cols if col not in input_df.columns]
+        st.error(f"Missing numerical columns: {missing_cols}")
+        return None  # Handle missing columns case
     
     return input_df
+
 
 
 def arima_predict(input_df):
