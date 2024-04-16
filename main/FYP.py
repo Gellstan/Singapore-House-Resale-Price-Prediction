@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
 import pickle
-import tensorflow as tf
-from tf.keras.models import load_model # type: ignore
+from tensorflow.keras.models import load_model # type: ignore
 import json
 import numpy as np
 
