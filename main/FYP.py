@@ -119,8 +119,8 @@ def main():
                 'lease_commence_date': int(lease_commence_date),
                 'resale_price': float(resale_price),
                 'year_population': int(year_population),
-                'have_school': int(have_school == 'Yes'),
-                'have_public_transit': int(have_public_transit == 'Yes')
+                'have_school': int(have_school),
+                'have_public_transit': int(have_public_transit)
             }
             features = pd.DataFrame(data, index=[0])
             features['month'] = pd.to_datetime(features['month'], errors='coerce')
