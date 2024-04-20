@@ -84,7 +84,8 @@ def create_dataset(dataset, look_back=12):
     return np.array(dataX), np.array(dataY)
 
 def lstm_predict(input_df):
-    data_reshaped = input_df.values.reshape(-1, 1)
+    monthly_data = input_df['resale_price'].resample('M').mean()
+    data_reshaped = monthly_data.values.reshape(-1, 1)
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(data_reshaped)
     look_back = 12
