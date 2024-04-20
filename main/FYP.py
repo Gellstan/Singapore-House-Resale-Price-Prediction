@@ -90,7 +90,7 @@ def lstm_predict(input_df):
     scaled_data = scaler.fit_transform(data_reshaped)
     look_back = 12
     X, y = create_dataset(scaled_data, look_back)
-    lstm_prediction = lstm_model.predict(X,y)
+    lstm_prediction = lstm_model.predict(X)
     return lstm_prediction
     
 def prophet_predict(input_df):
