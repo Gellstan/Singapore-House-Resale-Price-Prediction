@@ -94,7 +94,7 @@ def lstm_predict(input_df):
     scaled_data = price_scaler.transform(resale_prices)
 
     # Create dataset without requiring resampling
-    X, _ = create_dataset(scaled_data, look_back=1)  # Keep look_back minimal for single predictions
+    X, _ = create_dataset(scaled_data, look_back=0)
 
     if X.size == 0:
         raise ValueError("Not enough data for LSTM prediction. Please provide more data.")
