@@ -71,42 +71,30 @@ def arima_predict(input_df):
         raise TypeError("Index is not a datetime type, which is required for ARIMA predictions.")
 
     # Perform prediction using the ARIMA model
-    start, end = '2020-01', '2030-12'
-    arima_prediction = arima_model.predict(start=start, end=end)
+    end = '2030-12'
+    arima_prediction = arima_model.predict(start=input_series.index, end=end)
     return arima_prediction
     
-def create_dataset(dataset, look_back):
-    dataX, dataY = [], []
-    for i in range(len(dataset)-look_back):
-        a = dataset[i:(i+look_back), 0]
-        dataX.append(a)
-        dataY.append(dataset[i + look_back, 0])
-    return np.array(dataX), np.array(dataY)
 
 def lstm_predict(input_df):
-    if 'resale_price' not in input_df.columns:
-        raise ValueError("Input dataframe must contain 'resale_price'.")
+    lstm_input = input_df.values.reshape((1, input_df.shape[0], input_df.shape[1]))
 
-    # Ensure data is in a float format
-    resale_prices = input_df['resale_price'].astype(float).values.reshape(-1, 1)
+    lstm_predictions = lstm_model.predict(lstm_input)
 
-    # Scale data
-    scaled_data = price_scaler.transform(resale_prices)
-
-    # Create dataset without requiring resampling
-    X, _ = create_dataset(scaled_data, look_back=0)
-
-    if X.size == 0:
-        raise ValueError("Not enough data for LSTM prediction. Please provide more data.")
-
-    # Predict using LSTM model
-    lstm_prediction = lstm_model.predict(X[-1:])  # Predict on the last (or only) sequence
-    return lstm_prediction
-
+    return lstm_predictions
     
 def prophet_predict(input_df):
-    prophet_prediction = prophet_model.predict(input_df)
-    return prophet_prediction
+    # Rename columns as required by Prophet: 'ds' for the date and 'y' for the value
+    if 'month' in input_df.columns:
+        input_df.rename(columns={'month': 'ds'}, inplace=True)
+
+    if 'resale_price' in input_df.columns:
+        input_df.rename(columns={'resale_price': 'y'}, inplace=True)
+
+    # The Prophet model expects a DataFrame with at least 'ds' and 'y'
+    prophet_prediction = prophet_model.predict(input_df[['ds', 'y']])
+    return prophet_prediction[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+
 
 def main():
     st.write("""
@@ -193,7 +181,8 @@ def main():
     
     st.subheader('Prophet Prediction')
     prophet_prediction = prophet_predict(processed_input_df)
-    st.write(prophet_prediction)
+    unscaled_prophet_prediction = arima_invert_scaling(prophet_prediction)
+    st.write(unscaled_prophet_prediction)
     st.write('---')
 
 main()
