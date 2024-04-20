@@ -88,7 +88,7 @@ def lstm_predict(input_df):
     if 'resale_price' not in input_df.columns:
         raise ValueError("Input dataframe must contain 'resale_price'.")
 
-    monthly_data = input_df['resale_price'].resample('M').mean()
+    monthly_data = input_df['resale_price']
     
     # Check for NaN values and handle them
     if monthly_data.isna().any():
