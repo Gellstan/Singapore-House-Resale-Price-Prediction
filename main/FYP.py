@@ -84,30 +84,32 @@ def create_dataset(dataset, look_back=1):
     return np.array(dataX), np.array(dataY)
 
 def lstm_predict(input_df):
-    # Ensure there's 'resale_price' in DataFrame
     if 'resale_price' not in input_df.columns:
         raise ValueError("Input dataframe must contain 'resale_price'.")
 
-    monthly_data = input_df['resale_price']
+    monthly_data = input_df['resale_price'].resample('M').mean()
     
-    # Check for NaN values and handle them
     if monthly_data.isna().any():
-        monthly_data.fillna(method='ffill', inplace=True)  # Forward fill or choose an appropriate method
+        monthly_data.fillna(method='ffill', inplace=True)  # Forward fill
+        
+    look_back = 1
+    if monthly_data.size < look_back + 1:
+        raise ValueError(f"Insufficient data after resampling and NaN handling. Needed: {look_back+1}, available: {monthly_data.size}")
 
     data_reshaped = monthly_data.values.reshape(-1, 1)
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(data_reshaped)
 
-    look_back = 12
     X, y = create_dataset(scaled_data, look_back)
 
-    # Ensure X is not empty and has the correct shape
     if X.size == 0:
-        raise ValueError("No data available for LSTM prediction.")
+        raise ValueError("No data available for LSTM prediction. Check dataset size and look_back parameter.")
+
     print("Shape of input to LSTM:", X.shape)
 
     lstm_prediction = lstm_model.predict(X)
     return lstm_prediction
+
     
 def prophet_predict(input_df):
     prophet_prediction = prophet_model.predict(input_df)
