@@ -49,6 +49,12 @@ def arima_invert_scaling(scaled_predictions):
     original_scale_predictions = original_scale_predictions.astype(float)
     return original_scale_predictions
 
+def invert_scaling(scaled_predictions):
+    scaled_predictions = np.array(scaled_predictions).reshape(-1, 1)
+    original_scale_predictions = arima_scaler.inverse_transform(scaled_predictions)
+    original_scale_predictions = original_scale_predictions.astype(float)
+    return original_scale_predictions
+
 def arima_predict(input_df):
     # Check if 'month' is a column, convert it to datetime, and set it as the index
     if 'month' in input_df.columns:
@@ -69,8 +75,22 @@ def arima_predict(input_df):
     arima_prediction = arima_model.predict(start=start, end=end)
     return arima_prediction
     
+def create_dataset(dataset, look_back=12):
+    dataX, dataY = [], []
+    for i in range(len(dataset) - look_back):
+        a = dataset[i:(i + look_back), 0]
+        dataX.append(a)
+        dataY.append(dataset[i + look_back, 0])
+    return np.array(dataX), np.array(dataY)
+
 def lstm_predict(input_df):
-    lstm_prediction = lstm_model.predict(input_df)
+    data_reshaped = input_df.values.reshape(-1, 1)
+    scaler = MinMaxScaler(feature_range=(0, 1))
+    scaled_data = scaler.fit_transform(data_reshaped)
+    look_back = 12
+    X, y = create_dataset(scaled_data, look_back)
+    X = np.reshape(X, (X.shape[0], X.shape[1], 1))
+    lstm_prediction = lstm_model.predict(X)
     return lstm_prediction
     
 def prophet_predict(input_df):
@@ -145,11 +165,19 @@ def main():
     arima_prediction = arima_predict(processed_input_df)
     unscaled_arima_prediction = arima_invert_scaling(arima_prediction)
     st.write(unscaled_arima_prediction)
+    
+    #Graph
+    
     st.write('---')
     
     st.subheader('LSTM Prediction')
     lstm_prediction = lstm_predict(processed_input_df)
-    st.write(lstm_prediction)
+    unscaled_arima_prediction_1 = invert_scaling(lstm_prediction)
+    unscaled_arima_prediction_2 = invert_scaling(unscaled_arima_prediction_1)
+    st.write(unscaled_arima_prediction_2)
+    
+    #Graph
+    
     st.write('---')
     
     st.subheader('Prophet Prediction')
