@@ -40,6 +40,13 @@ def preprocess_data(input_df):
     
     return input_df
 
+def invert_scaling(scaled_predictions):
+    # Convert list or numpy array to 2D array if necessary
+    scaled_predictions = np.array(scaled_predictions).reshape(-1, 1)
+    # Inverse transform the predictions
+    original_scale_predictions = minmax_scaler.inverse_transform(scaled_predictions)
+    return original_scale_predictions
+
 def arima_predict(input_df):
     # Check if 'month' is a column, convert it to datetime, and set it as the index
     if 'month' in input_df.columns:
@@ -134,7 +141,8 @@ def main():
     st.subheader('ARIMA Prediction')
     processed_input_df = preprocess_data(input_df)
     arima_prediction = arima_predict(processed_input_df)
-    st.write(arima_prediction)
+    unscaled_arima_prediction = invert_scaling(arima_prediction)
+    st.write(unscaled_arima_prediction)
     st.write('---')
     
     st.subheader('LSTM Prediction')
