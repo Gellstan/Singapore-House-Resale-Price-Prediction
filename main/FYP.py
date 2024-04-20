@@ -78,11 +78,9 @@ def arima_predict(input_df):
 
 def lstm_predict(input_df):
     try:
-        print("Preprocessing input...")
         lstm_input = input_df.values.astype('float32').reshape((1, input_df.shape[0], input_df.shape[1]))
         print("Shape of input to LSTM:", lstm_input.shape)
         
-        print("Making predictions...")
         lstm_predictions = lstm_model.predict(lstm_input)
         return lstm_predictions.flatten()
     except Exception as e:
