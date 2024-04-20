@@ -75,7 +75,7 @@ def arima_predict(input_df):
     arima_prediction = arima_model.predict(start=start, end=end)
     return arima_prediction
     
-def create_dataset(dataset, look_back=1):
+def create_dataset(dataset, look_back):
     dataX, dataY = [], []
     for i in range(len(dataset)-look_back):
         a = dataset[i:(i+look_back), 0]
@@ -87,27 +87,20 @@ def lstm_predict(input_df):
     if 'resale_price' not in input_df.columns:
         raise ValueError("Input dataframe must contain 'resale_price'.")
 
-    monthly_data = input_df['resale_price'].resample('M').mean()
-    
-    if monthly_data.isna().any():
-        monthly_data.fillna(method='ffill', inplace=True)  # Forward fill
-        
-    look_back = 1
-    if monthly_data.size < look_back + 1:
-        raise ValueError(f"Insufficient data after resampling and NaN handling. Needed: {look_back+1}, available: {monthly_data.size}")
+    # Ensure data is in a float format
+    resale_prices = input_df['resale_price'].astype(float).values.reshape(-1, 1)
 
-    data_reshaped = monthly_data.values.reshape(-1, 1)
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(data_reshaped)
+    # Scale data
+    scaled_data = minmax_scaler.transform(resale_prices)
 
-    X, y = create_dataset(scaled_data, look_back)
+    # Create dataset without requiring resampling
+    X, _ = create_dataset(scaled_data, look_back=1)  # Keep look_back minimal for single predictions
 
     if X.size == 0:
-        raise ValueError("No data available for LSTM prediction. Check dataset size and look_back parameter.")
+        raise ValueError("Not enough data for LSTM prediction. Please provide more data.")
 
-    print("Shape of input to LSTM:", X.shape)
-
-    lstm_prediction = lstm_model.predict(X)
+    # Predict using LSTM model
+    lstm_prediction = lstm_model.predict(X[-1:])  # Predict on the last (or only) sequence
     return lstm_prediction
 
     
