@@ -14,7 +14,7 @@ prophet_model = pickle.load(open("main/Prophet_model.pkl", "rb"))
 label_encoders_flat_type = pickle.load(open('main/Label_Encoder_Flat_Type.pkl', 'rb'))
 label_encoders_storey_range = pickle.load(open('main/Label_Encoder_Storey_Range.pkl', 'rb'))
 minmax_scaler = pickle.load(open('main/Scaler.pkl', 'rb'))
-arima_scaler = pickle.load(open('main/Scaler_ARIMA.pkl', 'rb'))
+price_scaler = pickle.load(open('main/Scaler_ARIMA.pkl', 'rb'))
 
 feature_var = json.load(open("main/columns_unique.json"))
 data_columns = feature_var['data_columns']
@@ -45,13 +45,13 @@ def arima_invert_scaling(scaled_predictions):
     last_known_value = 0.3629080527602271
     reintegrated_forecast = np.cumsum(np.insert(scaled_predictions, 0, last_known_value))[-24:]
     scaled_predictions = np.array(reintegrated_forecast).reshape(-1, 1)
-    original_scale_predictions = arima_scaler.inverse_transform(scaled_predictions)
+    original_scale_predictions = price_scaler.inverse_transform(scaled_predictions)
     original_scale_predictions = original_scale_predictions.astype(float)
     return original_scale_predictions
 
 def invert_scaling(scaled_predictions):
     scaled_predictions = np.array(scaled_predictions).reshape(-1, 1)
-    original_scale_predictions = arima_scaler.inverse_transform(scaled_predictions)
+    original_scale_predictions = price_scaler.inverse_transform(scaled_predictions)
     original_scale_predictions = original_scale_predictions.astype(float)
     return original_scale_predictions
 
@@ -91,7 +91,7 @@ def lstm_predict(input_df):
     resale_prices = input_df['resale_price'].astype(float).values.reshape(-1, 1)
 
     # Scale data
-    scaled_data = minmax_scaler.transform(resale_prices)
+    scaled_data = price_scaler.transform(resale_prices)
 
     # Create dataset without requiring resampling
     X, _ = create_dataset(scaled_data, look_back=1)  # Keep look_back minimal for single predictions
