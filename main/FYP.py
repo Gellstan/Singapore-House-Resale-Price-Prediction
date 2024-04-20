@@ -41,11 +41,9 @@ def preprocess_data(input_df):
     return input_df
 
 def invert_scaling(scaled_predictions):
-    # Convert list or numpy array to 2D array if necessary
     scaled_predictions = np.array(scaled_predictions).reshape(-1, 1)
-    # Inverse transform the predictions
     original_scale_predictions = minmax_scaler.inverse_transform(scaled_predictions)
-    return original_scale_predictions
+    return original_scale_predictions.flatten()
 
 def arima_predict(input_df):
     # Check if 'month' is a column, convert it to datetime, and set it as the index
