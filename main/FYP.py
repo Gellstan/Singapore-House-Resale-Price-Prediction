@@ -14,6 +14,7 @@ prophet_model = pickle.load(open("main/Prophet_model.pkl", "rb"))
 label_encoders_flat_type = pickle.load(open('main/Label_Encoder_Flat_Type.pkl', 'rb'))
 label_encoders_storey_range = pickle.load(open('main/Label_Encoder_Storey_Range.pkl', 'rb'))
 minmax_scaler = pickle.load(open('main/Scaler.pkl', 'rb'))
+arima_scaler = pickle.load(open('main/Scaler_ARIMA.pkl', 'rb'))
 
 feature_var = json.load(open("main/columns_unique.json"))
 data_columns = feature_var['data_columns']
@@ -42,7 +43,7 @@ def preprocess_data(input_df):
 
 def invert_scaling(scaled_predictions):
     scaled_predictions = np.array(scaled_predictions).reshape(-1, 1)
-    original_scale_predictions = minmax_scaler.inverse_transform(scaled_predictions)
+    original_scale_predictions = arima_scaler.inverse_transform(scaled_predictions)
     return original_scale_predictions.flatten()
 
 def arima_predict(input_df):
