@@ -3,3 +3,4 @@ tensorflow
 statsmodels
 prophet
 scikit-learn
+pmdarima
