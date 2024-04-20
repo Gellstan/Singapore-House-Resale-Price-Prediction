@@ -90,7 +90,6 @@ def lstm_predict(input_df):
     scaled_data = scaler.fit_transform(data_reshaped)
     look_back = 12
     X, y = create_dataset(scaled_data, look_back)
-    X = np.reshape(X, (X.shape[0], X.shape[1], 1))
     lstm_prediction = lstm_model.predict(X,y)
     return lstm_prediction
     
