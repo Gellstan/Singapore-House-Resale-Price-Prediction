@@ -41,12 +41,12 @@ def preprocess_data(input_df):
     
     return input_df
 
-def invert_scaling(scaled_predictions):
+def arima_invert_scaling(scaled_predictions):
     last_known_value = 0.3629080527602271
     reintegrated_forecast = np.cumsum(np.insert(scaled_predictions, 0, last_known_value))[-24:]
     scaled_predictions = np.array(reintegrated_forecast).reshape(-1, 1)
     original_scale_predictions = arima_scaler.inverse_transform(scaled_predictions)
-    return original_scale_predictions
+    return float(original_scale_predictions)
 
 def arima_predict(input_df):
     # Check if 'month' is a column, convert it to datetime, and set it as the index
@@ -142,7 +142,7 @@ def main():
     st.subheader('ARIMA Prediction')
     processed_input_df = preprocess_data(input_df)
     arima_prediction = arima_predict(processed_input_df)
-    unscaled_arima_prediction = invert_scaling(arima_prediction)
+    unscaled_arima_prediction = arima_invert_scaling(arima_prediction)
     st.write(unscaled_arima_prediction)
     st.write('---')
     
