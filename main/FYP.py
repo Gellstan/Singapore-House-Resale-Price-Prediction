@@ -76,17 +76,6 @@ def arima_predict(input_df):
     return arima_prediction
     
 
-def lstm_predict(input_df):
-    try:
-        lstm_input = input_df.values.astype('float32').reshape((1, input_df.shape[0], input_df.shape[1]))
-        print("Shape of input to LSTM:", lstm_input.shape)
-        
-        lstm_predictions = lstm_model.predict(lstm_input)
-        return lstm_predictions.flatten()
-    except Exception as e:
-        print("Error during LSTM prediction:", e)
-        raise
-
     
 def prophet_predict(input_df):
     # Rename columns as required by Prophet: 'ds' for the date and 'y' for the value
@@ -175,11 +164,6 @@ def main():
     st.write('---')
     
     st.subheader('LSTM Prediction')
-    lstm_prediction = lstm_predict(processed_input_df)
-    unscaled_arima_prediction_1 = invert_scaling(lstm_prediction)
-    unscaled_arima_prediction_2 = invert_scaling(unscaled_arima_prediction_1)
-    st.write(unscaled_arima_prediction_2)
-    
     #Graph
     
     st.write('---')
