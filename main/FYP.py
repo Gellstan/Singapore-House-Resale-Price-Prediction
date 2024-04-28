@@ -62,8 +62,7 @@ def prophet_invert_scaling(scaled_predictions):
     original_scale_predictions = original_scale_predictions.astype(float)
     # Convert array back to DataFrame and add necessary columns
     result_df = pd.DataFrame(original_scale_predictions, columns=['predicted_value','predicted_value_lower','predicted_value_upper'])
-    last_known_date = scaled_predictions['ds'].max()
-    start_date = last_known_date + pd.Timedelta(days=1)
+    start_date = scaled_predictions['ds'].max() + pd.Timedelta(days=1)
     result_df['ds'] = pd.date_range(start=start_date, periods=result_df.shape[0], freq='M')
     return result_df
 
@@ -92,17 +91,22 @@ def prophet_predict(input_df):
     monthly_data = input_df['resale_price'].resample('M').mean()
     prophet_df = monthly_data.reset_index()
     prophet_df.columns = ['ds', 'y']
-
-    prophet_prediction = prophet_model.predict(prophet_df[['ds', 'y']])
+    user_input_date = prophet_df['ds']
+    end_date = pd.to_datetime('2030-12-01')
+    periods = (end_date.year - user_input_date.year) * 12 + (end_date.month - user_input_date.month)
+    future = prophet_model.make_future_dataframe(periods=periods, freq='M')
+    prophet_prediction = prophet_model.predict(future)
+    
     return prophet_prediction[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
 
 def predicted_plot(unscaled_prophet_prediction):
     fig, ax = plt.subplots(figsize=(10, 6))  # Set the figure size here
-    ax.plot(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['predicted_value'], label='Predicted')
+    ax.plot(origin_data['month'], origin_data['resale_price'], label='Historical', color='blue')
+    ax.plot(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['predicted_value'], label='Predicted', color='orange')
     ax.fill_between(unscaled_prophet_prediction['ds'], 
                     unscaled_prophet_prediction['predicted_value_lower'], 
                     unscaled_prophet_prediction['predicted_value_upper'], 
-                    color='gray', alpha=0.5)  # Use the ax object for fill_between
+                    color='gray', alpha=0.2, label='Confidence Interval')  # Use the ax object for fill_between
     
     ax.set_xlabel('Date')  # Use set_xlabel on ax
     ax.set_ylabel('Value')  # Use set_ylabel on ax
