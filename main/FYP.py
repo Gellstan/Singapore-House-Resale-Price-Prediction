@@ -100,6 +100,8 @@ def prophet_predict(input_df):
     return prophet_prediction[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
 
 def predicted_plot(unscaled_prophet_prediction):
+    if not pd.api.types.is_datetime64_any_dtype(unscaled_prophet_prediction['ds']):
+        unscaled_prophet_prediction['ds'] = pd.to_datetime(unscaled_prophet_prediction['ds'])
     fig, ax = plt.subplots(figsize=(10, 6))  # Set the figure size here
     ax.plot(origin_data['month'], origin_data['resale_price'], label='Historical', color='blue')
     ax.plot(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['predicted_value'], label='Predicted', color='orange')
