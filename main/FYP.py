@@ -103,7 +103,9 @@ def predicted_plot(unscaled_prophet_prediction):
     plt.xlabel('Date')
     plt.ylabel('Value')
     plt.legend()
-    plt.show()
+    
+    # Use Streamlit's function to display the plot
+    st.pyplot()
 
 
 def main():
