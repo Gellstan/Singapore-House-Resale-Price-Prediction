@@ -50,6 +50,7 @@ def arima_invert_scaling(scaled_predictions):
     original_scale_predictions = original_scale_predictions.astype(float)
     return original_scale_predictions
 
+
 def invert_scaling(scaled_predictions):
     scaled_predictions = np.array(scaled_predictions).reshape(-1, 1)
     original_scale_predictions = price_scaler.inverse_transform(scaled_predictions)
@@ -175,7 +176,7 @@ def main():
     
     st.subheader('Prophet Prediction')
     prophet_prediction = prophet_predict(processed_input_df)
-    unscaled_prophet_prediction = arima_invert_scaling(prophet_prediction)
+    unscaled_prophet_prediction = invert_scaling(prophet_prediction)
     prophet_plot = predicted_plot(unscaled_prophet_prediction)
     st.write(unscaled_prophet_prediction)
     st.write(prophet_plot)
