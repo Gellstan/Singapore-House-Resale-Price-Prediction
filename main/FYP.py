@@ -186,17 +186,18 @@ def main():
     st.write(input_df)
     st.write('---')
     
-    st.subheader('ARIMA Prediction')
-    processed_input_df = preprocess_data(input_df)
-    arima_prediction = arima_predict(processed_input_df)
-    unscaled_arima_prediction = arima_invert_scaling(arima_prediction)
-    st.write(unscaled_arima_prediction)
+    #st.subheader('ARIMA Prediction')
+    
+    #arima_prediction = arima_predict(processed_input_df)
+    #unscaled_arima_prediction = arima_invert_scaling(arima_prediction)
+    #st.write(unscaled_arima_prediction)
     
     #Graph
     
-    st.write('---')
+    #st.write('---')
     
     st.subheader('Prophet Prediction')
+    processed_input_df = preprocess_data(input_df)
     prophet_prediction = prophet_predict(processed_input_df)
     unscaled_prophet_prediction = prophet_invert_scaling(prophet_prediction)
     st.write(unscaled_prophet_prediction)
