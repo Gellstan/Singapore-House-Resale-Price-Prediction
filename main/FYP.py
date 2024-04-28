@@ -87,7 +87,7 @@ def prophet_invert_scaling(scaled_predictions):
     result_df.set_index('ds',inplace=True)
     return result_df
     
-def prophet_predict(input_df, start_price):
+def prophet_predict(input_df):
     # Ensure input_df has 'month' in datetime format and set as index
     if not pd.api.types.is_datetime64_any_dtype(input_df['month']):
         input_df['month'] = pd.to_datetime(input_df['month'])
@@ -96,7 +96,7 @@ def prophet_predict(input_df, start_price):
     # Assume the starting date and price are given by the user and simulate this as past data
     prophet_df = pd.DataFrame({
         'ds': input_df.index,
-        'y': np.full(len(input_df.index), start_price)  # Set all entries to start_price
+        'y': np.full(len(input_df.index), input_df['resale_price'])  # Set all entries to start_price
     })
 
     # Future dataframe creation extending to 2030-12
