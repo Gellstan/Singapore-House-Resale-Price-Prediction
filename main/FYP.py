@@ -97,9 +97,13 @@ def prophet_predict(input_df):
     prophet_df = monthly_data.reset_index()
     prophet_df.columns = ['ds', 'y']
 
-    future = prophet_model.make_future_dataframe(periods=120, freq='M')
-    prophet_prediction = prophet_model.predict(future)
+
+    # Assume the input_df is prepared and contains 'ds' and 'y'
+    future = prophet_model.make_future_dataframe(periods=120, freq='M', include_history=False)
+    future = future[future['ds'] >= prophet_df['ds'].min()]  # Use the provided input dates and forward
+    future = pd.concat([prophet_df[['ds', 'y']], future[~future['ds'].isin(prophet_df['ds'])]], ignore_index=True)
     
+    prophet_prediction = prophet_model.predict(future)
     return prophet_prediction[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
 
 
@@ -127,8 +131,6 @@ def predicted_plot(unscaled_prophet_prediction):
     ax.legend()
 
     st.pyplot(fig)
-
-
 
 
 def main():
