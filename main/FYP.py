@@ -10,7 +10,6 @@ from prophet import Prophet
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
-origin_data = pd.read_csv('main/Final_data.csv')
 # lstm_model = load_model('main/LSTM_model.h5')
 arima_model = pickle.load(open("main/ARIMA_model.pkl", "rb"))
 prophet_model = pickle.load(open("main/Prophet_model.pkl", "rb"))
@@ -106,7 +105,6 @@ def predicted_plot(unscaled_prophet_prediction):
     
     # Convert dates explicitly to matplotlib's internal representation of dates
     dates = mdates.date2num(unscaled_prophet_prediction.index.to_pydatetime())
-    ax.plot(origin_data['month'], origin_data['resale_price'], label='Historical', color='blue')
     ax.plot(dates, unscaled_prophet_prediction['predicted_value'], label='Predicted', color='orange')
     ax.fill_between(dates, 
                     unscaled_prophet_prediction['predicted_value_lower'], 
