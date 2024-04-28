@@ -106,8 +106,12 @@ def predicted_plot(unscaled_prophet_prediction):
     
     # Convert dates explicitly to matplotlib's internal representation of dates
     dates = mdates.date2num(unscaled_prophet_prediction.index.to_pydatetime())
-    
+    ax.plot(origin_data['month'], origin_data['resale_price'], label='Historical', color='blue')
     ax.plot(dates, unscaled_prophet_prediction['predicted_value'], label='Predicted', color='orange')
+    ax.fill_between(dates, 
+                    unscaled_prophet_prediction['predicted_value_lower'], 
+                    unscaled_prophet_prediction['predicted_value_upper'], 
+                    color='gray', alpha=0.2, label='Confidence Interval')
     
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
