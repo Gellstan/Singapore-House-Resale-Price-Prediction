@@ -61,7 +61,7 @@ def prophet_invert_scaling(scaled_predictions):
     original_scale_predictions = price_scaler.inverse_transform(scaled_array)
     original_scale_predictions = original_scale_predictions.astype(float)
     # Convert array back to DataFrame and add necessary columns
-    result_df = pd.DataFrame(original_scale_predictions, columns=['yhat'])
+    result_df = pd.DataFrame(original_scale_predictions, columns=['predicted_value'])
     result_df['ds'] = pd.date_range(start='your_start_date', periods=len(result_df), freq='M')  # Modify as per your date range
     return result_df
 
@@ -96,7 +96,7 @@ def prophet_predict(input_df):
 
 def predicted_plot(unscaled_prophet_prediction):
     plt.figure(figsize=(10, 6))
-    plt.plot(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['yhat'], label='Predicted')
+    plt.plot(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['predicted_value'], label='Predicted')
     plt.fill_between(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['yhat_lower'], unscaled_prophet_prediction['yhat_upper'], color='gray', alpha=0.5)  # Adjust lower_bound and upper_bound accordingly
     plt.xlabel('Date')
     plt.ylabel('Value')
