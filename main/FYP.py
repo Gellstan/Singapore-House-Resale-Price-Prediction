@@ -49,10 +49,14 @@ def arima_invert_scaling(scaled_predictions):
     original_scale_predictions = price_scaler.inverse_transform(scaled_predictions)
     return original_scale_predictions
 
-
 def invert_scaling(scaled_predictions):
-    scaled_predictions = np.array(scaled_predictions).reshape(-1, 1)
-    original_scale_predictions = price_scaler.inverse_transform(scaled_predictions)
+    if isinstance(scaled_predictions, pd.DataFrame):
+        numeric_cols = scaled_predictions.select_dtypes(include=[np.number])
+        scaled_array = numeric_cols.values
+    else:
+        scaled_array = np.array(scaled_predictions).reshape(-1, 1)
+
+    original_scale_predictions = price_scaler.inverse_transform(scaled_array)
     original_scale_predictions = original_scale_predictions.astype(float)
     return original_scale_predictions
 
