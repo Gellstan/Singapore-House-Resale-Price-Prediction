@@ -97,7 +97,6 @@ def prophet_predict(input_df):
     prophet_df = monthly_data.reset_index()
     prophet_df.columns = ['ds', 'y']
 
-
     # Assume the input_df is prepared and contains 'ds' and 'y'
     future = prophet_model.make_future_dataframe(periods=120, freq='M', include_history=False)
     future = future[future['ds'] >= prophet_df['ds'].min()]  # Use the provided input dates and forward
@@ -110,27 +109,19 @@ def prophet_predict(input_df):
 
 def predicted_plot(unscaled_prophet_prediction):
     fig, ax = plt.subplots(figsize=(10, 6))
-    
-    # Ensure the index is a datetime type without timezone issues
-    if unscaled_prophet_prediction.index.tz is not None:
-        unscaled_prophet_prediction.index = unscaled_prophet_prediction.index.tz_localize(None)
-    
-    # Convert dates explicitly to matplotlib's internal representation of dates
-    dates = mdates.date2num(unscaled_prophet_prediction.index.to_pydatetime())
+    dates = mdates.date2num(pd.to_datetime(unscaled_prophet_prediction['ds']).to_pydatetime())
     ax.plot(dates, unscaled_prophet_prediction['predicted_value'], label='Predicted', color='orange')
     ax.fill_between(dates, 
                     unscaled_prophet_prediction['predicted_value_lower'], 
                     unscaled_prophet_prediction['predicted_value_upper'], 
                     color='gray', alpha=0.2, label='Confidence Interval')
-    
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-
     ax.set_xlabel('Date')
     ax.set_ylabel('Value')
     ax.legend()
-
     st.pyplot(fig)
+
 
 
 def main():
