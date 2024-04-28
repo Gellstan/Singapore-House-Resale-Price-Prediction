@@ -8,7 +8,7 @@ from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 
 origin_data = pd.read_csv('Final_data.csv')
-lstm_model = load_model('main/LSTM_model.h5')
+# lstm_model = load_model('main/LSTM_model.h5')
 arima_model = pickle.load(open("main/ARIMA_model.pkl", "rb"))
 prophet_model = pickle.load(open("main/Prophet_model.pkl", "rb"))
 label_encoders_flat_type = pickle.load(open('main/Label_Encoder_Flat_Type.pkl', 'rb'))
