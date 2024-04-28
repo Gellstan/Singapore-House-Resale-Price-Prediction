@@ -64,6 +64,7 @@ def prophet_invert_scaling(scaled_predictions):
     result_df = pd.DataFrame(original_scale_predictions, columns=['predicted_value','predicted_value_lower','predicted_value_upper'])
     start_date = scaled_predictions['ds'].min()
     result_df['ds'] = pd.date_range(start=start_date, periods=result_df.shape[0], freq='M')
+    result_df.set_index('ds',inplace=True)
     return result_df
 
 def arima_predict(input_df):
@@ -195,7 +196,7 @@ def main():
     prophet_prediction = prophet_predict(processed_input_df)
     unscaled_prophet_prediction = prophet_invert_scaling(prophet_prediction)
     st.write(unscaled_prophet_prediction)
-    prophet_plot = predicted_plot(unscaled_prophet_prediction)
+    predicted_plot(unscaled_prophet_prediction)
     st.write('---')
 
 main()
