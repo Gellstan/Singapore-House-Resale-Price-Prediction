@@ -100,7 +100,7 @@ def prophet_predict(input_df):
     })
 
     # Future dataframe creation extending to 2030-12
-    future = prophet_model.make_future_dataframe(periods=120, freq='M')
+    future = prophet_model.make_future_dataframe(periods=122, freq='M')
     future = pd.concat([prophet_df, future[future['ds'] > prophet_df['ds'].max()]])
 
     # Prediction
