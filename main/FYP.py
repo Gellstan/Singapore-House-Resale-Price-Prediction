@@ -87,28 +87,27 @@ def prophet_invert_scaling(scaled_predictions):
     result_df.set_index('ds',inplace=True)
     return result_df
     
-def prophet_predict(input_df):
-
+def prophet_predict(input_df, start_price):
+    # Ensure input_df has 'month' in datetime format and set as index
     if not pd.api.types.is_datetime64_any_dtype(input_df['month']):
         input_df['month'] = pd.to_datetime(input_df['month'])
-
     input_df.set_index('month', inplace=True)
-    monthly_data = input_df['resale_price'].resample('M').mean()
-    prophet_df = monthly_data.reset_index()
-    prophet_df.columns = ['ds', 'y']
+
+    # Assume the starting date and price are given by the user and simulate this as past data
+    prophet_df = pd.DataFrame({
+        'ds': input_df.index,
+        'y': np.full(len(input_df.index), start_price)  # Set all entries to start_price
+    })
+
+    # Future dataframe creation extending to 2030-12
+    future = prophet_model.make_future_dataframe(periods=(2030 - prophet_df['ds'].dt.year.max()) * 12 + 12, freq='M')
+    future = pd.concat([prophet_df, future[future['ds'] > prophet_df['ds'].max()]])
+
+    # Prediction
+    forecast = prophet_model.predict(future)
     
-    end_date = pd.to_datetime('2030-12')
+    return forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
 
-    # Calculate the number of months to forecast
-    periods = (end_date.year - prophet_df['ds'].dt.year[0]) * 12 + end_date.month - prophet_df['ds'].dt.month[0]
-
-    # Generate future dates from the last date available in prophet_df
-    future = prophet_model.make_future_dataframe(periods=periods, freq='M', include_history=True)
-
-    # Use the prophet model to predict these future dates
-    prophet_prediction = prophet_model.predict(future)
-    
-    return prophet_prediction[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
 
 
 def predicted_plot(unscaled_prophet_prediction):
