@@ -50,23 +50,6 @@ def arima_invert_scaling(scaled_predictions):
     original_scale_predictions = price_scaler.inverse_transform(scaled_predictions)
     return original_scale_predictions
 
-def prophet_invert_scaling(scaled_predictions):
-    if isinstance(scaled_predictions, pd.DataFrame):
-        numeric_cols = scaled_predictions.select_dtypes(include=[np.number])
-        scaled_array = numeric_cols.values
-    else:
-        scaled_array = np.array(scaled_predictions).reshape(-1, 1)
-
-        # Assuming scaled_predictions is an array of numeric values
-    original_scale_predictions = price_scaler.inverse_transform(scaled_array)
-    original_scale_predictions = original_scale_predictions.astype(float)
-    # Convert array back to DataFrame and add necessary columns
-    result_df = pd.DataFrame(original_scale_predictions, columns=['predicted_value','predicted_value_lower','predicted_value_upper'])
-    start_date = scaled_predictions['ds'].min()
-    result_df['ds'] = pd.date_range(start=start_date, periods=result_df.shape[0], freq='M')
-    result_df.set_index('ds',inplace=True)
-    return result_df
-
 def arima_predict(input_df):
     # Check if 'month' is a column, convert it to datetime, and set it as the index
     if 'month' in input_df.columns:
@@ -87,6 +70,23 @@ def arima_predict(input_df):
     arima_prediction = arima_model.predict(start=input_series.index, end=end)
     return arima_prediction
     
+def prophet_invert_scaling(scaled_predictions):
+    if isinstance(scaled_predictions, pd.DataFrame):
+        numeric_cols = scaled_predictions.select_dtypes(include=[np.number])
+        scaled_array = numeric_cols.values
+    else:
+        scaled_array = np.array(scaled_predictions).reshape(-1, 1)
+
+        # Assuming scaled_predictions is an array of numeric values
+    original_scale_predictions = price_scaler.inverse_transform(scaled_array)
+    original_scale_predictions = original_scale_predictions.astype(float)
+    # Convert array back to DataFrame and add necessary columns
+    result_df = pd.DataFrame(original_scale_predictions, columns=['predicted_value','predicted_value_lower','predicted_value_upper'])
+    start_date = scaled_predictions['ds'].min()
+    result_df['ds'] = pd.date_range(start=start_date, periods=result_df.shape[0], freq='M')
+    result_df.set_index('ds',inplace=True)
+    return result_df
+    
 def prophet_predict(input_df):
 
     monthly_data = input_df['resale_price'].resample('M').mean()
@@ -102,18 +102,19 @@ def prophet_predict(input_df):
 
 def predicted_plot(unscaled_prophet_prediction):
     fig, ax = plt.subplots(figsize=(10, 6))  # Set the figure size here
+    # Plotting historical data
     ax.plot(origin_data['month'], origin_data['resale_price'], label='Historical', color='blue')
-    ax.plot(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['predicted_value'], label='Predicted', color='orange')
-    ax.fill_between(unscaled_prophet_prediction['ds'], 
+    # Plotting predicted data, using index since 'ds' is set as index
+    ax.plot(unscaled_prophet_prediction.index, unscaled_prophet_prediction['predicted_value'], label='Predicted', color='orange')
+    ax.fill_between(unscaled_prophet_prediction.index, 
                     unscaled_prophet_prediction['predicted_value_lower'], 
                     unscaled_prophet_prediction['predicted_value_upper'], 
-                    color='gray', alpha=0.2, label='Confidence Interval')  # Use the ax object for fill_between
+                    color='gray', alpha=0.2, label='Confidence Interval')
     
-    ax.set_xlabel('Date')  # Use set_xlabel on ax
-    ax.set_ylabel('Value')  # Use set_ylabel on ax
-    ax.legend()  # Use the legend method of ax
+    ax.set_xlabel('Date')
+    ax.set_ylabel('Value')
+    ax.legend()
 
-    # Display the plot using Streamlit
     st.pyplot(fig)
 
 
