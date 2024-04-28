@@ -93,12 +93,8 @@ def prophet_predict(input_df):
     monthly_data = input_df['resale_price'].resample('M').mean()
     prophet_df = monthly_data.reset_index()
     prophet_df.columns = ['ds', 'y']
-    #user_input_date = prophet_df['ds'].min()
-    #end_date = pd.to_datetime('2030-12')
-    #periods = (end_date.year - user_input_date.year) * 12 + (end_date.month - user_input_date.month)
     future = prophet_model.make_future_dataframe(periods=120, freq='M')
     prophet_prediction = prophet_model.predict(future)
-    
     return prophet_prediction[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
 
 def predicted_plot(unscaled_prophet_prediction):
@@ -112,10 +108,6 @@ def predicted_plot(unscaled_prophet_prediction):
     dates = mdates.date2num(unscaled_prophet_prediction.index.to_pydatetime())
     
     ax.plot(dates, unscaled_prophet_prediction['predicted_value'], label='Predicted', color='orange')
-    ax.fill_between(dates, 
-                    unscaled_prophet_prediction['predicted_value_lower'], 
-                    unscaled_prophet_prediction['predicted_value_upper'], 
-                    color='gray', alpha=0.2, label='Confidence Interval')
     
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
