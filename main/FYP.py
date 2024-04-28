@@ -88,7 +88,8 @@ def prophet_invert_scaling(scaled_predictions):
     return result_df
     
 def prophet_predict(input_df):
-    prophet_df = input_df.reset_index()
+    monthly_data = input_df['resale_price'].resample('M').mean()
+    prophet_df = monthly_data.reset_index()
     prophet_df.columns = ['ds', 'y']
     future = prophet_model.make_future_dataframe(periods=120, freq='M')
     prophet_prediction = prophet_model.predict(future)
