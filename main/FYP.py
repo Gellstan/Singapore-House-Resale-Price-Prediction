@@ -6,6 +6,7 @@ import json
 import numpy as np
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
+from prophet import Prophet
 
 origin_data = pd.read_csv('main/Final_data.csv')
 # lstm_model = load_model('main/LSTM_model.h5')
@@ -76,14 +77,11 @@ def arima_predict(input_df):
     return arima_prediction
     
 def prophet_predict(input_df):
-    # Rename columns as required by Prophet: 'ds' for the date and 'y' for the value
-    from prophet import Prophet
 
-    # Prepare the DataFrame for Prophet
     monthly_data = input_df['resale_price'].resample('M').mean()
     prophet_df = monthly_data.reset_index()
-    prophet_df.columns = ['ds', 'resale_price']
-    # The Prophet model expects a DataFrame with at least 'ds' and 'y'
+    prophet_df.columns = ['ds', 'y']
+
     prophet_prediction = prophet_model.predict(prophet_df[['ds', 'y']])
     return prophet_prediction[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
 
