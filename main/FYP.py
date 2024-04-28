@@ -62,7 +62,9 @@ def prophet_invert_scaling(scaled_predictions):
     original_scale_predictions = original_scale_predictions.astype(float)
     # Convert array back to DataFrame and add necessary columns
     result_df = pd.DataFrame(original_scale_predictions, columns=['predicted_value','predicted_value_lower','predicted_value_upper'])
-    result_df['ds'] = pd.date_range(start=scaled_predictions['ds'].head, periods=result_df.shape[0], freq='M')
+    last_known_date = scaled_predictions['ds'].max()
+    start_date = last_known_date + pd.Timedelta(days=1)
+    result_df['ds'] = pd.date_range(start=start_date, periods=result_df.shape[0], freq='M')
     return result_df
 
 def arima_predict(input_df):
