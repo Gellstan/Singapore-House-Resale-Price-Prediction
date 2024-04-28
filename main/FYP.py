@@ -97,31 +97,37 @@ def prophet_predict(input_df):
     prophet_df = monthly_data.reset_index()
     prophet_df.columns = ['ds', 'y']
 
-    # Assume the input_df is prepared and contains 'ds' and 'y'
-    future = prophet_model.make_future_dataframe(periods=120, freq='M', include_history=False)
-    future = future[future['ds'] >= prophet_df['ds'].min()]  # Use the provided input dates and forward
-    future = pd.concat([prophet_df[['ds', 'y']], future[~future['ds'].isin(prophet_df['ds'])]], ignore_index=True)
-    
+
+    future = prophet_model.make_future_dataframe(periods=120, freq='M')
     prophet_prediction = prophet_model.predict(future)
+    
     return prophet_prediction[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
 
 
 
 def predicted_plot(unscaled_prophet_prediction):
     fig, ax = plt.subplots(figsize=(10, 6))
-    dates = mdates.date2num(pd.to_datetime(unscaled_prophet_prediction['ds']).to_pydatetime())
+    
+    # Ensure the index is a datetime type without timezone issues
+    if unscaled_prophet_prediction.index.tz is not None:
+        unscaled_prophet_prediction.index = unscaled_prophet_prediction.index.tz_localize(None)
+    
+    # Convert dates explicitly to matplotlib's internal representation of dates
+    dates = mdates.date2num(unscaled_prophet_prediction.index.to_pydatetime())
     ax.plot(dates, unscaled_prophet_prediction['predicted_value'], label='Predicted', color='orange')
     ax.fill_between(dates, 
                     unscaled_prophet_prediction['predicted_value_lower'], 
                     unscaled_prophet_prediction['predicted_value_upper'], 
                     color='gray', alpha=0.2, label='Confidence Interval')
+    
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+
     ax.set_xlabel('Date')
     ax.set_ylabel('Value')
     ax.legend()
-    st.pyplot(fig)
 
+    st.pyplot(fig)
 
 
 def main():
