@@ -96,11 +96,11 @@ def prophet_predict(input_df):
     # Assume the starting date and price are given by the user and simulate this as past data
     prophet_df = pd.DataFrame({
         'ds': input_df.index,
-        'y': np.full(len(input_df.index), input_df['resale_price'])  # Set all entries to start_price
+        'y': np.full(len(input_df.index), input_df['resale_price']) 
     })
 
     # Future dataframe creation extending to 2030-12
-    future = prophet_model.make_future_dataframe(periods=(2030 - prophet_df['ds'].dt.year.max()) * 12 + 12, freq='M')
+    future = prophet_model.make_future_dataframe(periods=120, freq='M')
     future = pd.concat([prophet_df, future[future['ds'] > prophet_df['ds'].max()]])
 
     # Prediction
