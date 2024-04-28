@@ -88,9 +88,7 @@ def prophet_invert_scaling(scaled_predictions):
     return result_df
     
 def prophet_predict(input_df):
-
-    monthly_data = input_df['resale_price'].resample('M').mean()
-    prophet_df = monthly_data.reset_index()
+    prophet_df = input_df.reset_index()
     prophet_df.columns = ['ds', 'y']
     future = prophet_model.make_future_dataframe(periods=120, freq='M')
     prophet_prediction = prophet_model.predict(future)
@@ -186,16 +184,6 @@ def main():
     st.write(input_df)
     st.write('---')
     
-    #st.subheader('ARIMA Prediction')
-    
-    #arima_prediction = arima_predict(processed_input_df)
-    #unscaled_arima_prediction = arima_invert_scaling(arima_prediction)
-    #st.write(unscaled_arima_prediction)
-    
-    #Graph
-    
-    #st.write('---')
-    
     st.subheader('Prophet Prediction')
     processed_input_df = preprocess_data(input_df)
     prophet_prediction = prophet_predict(processed_input_df)
@@ -203,5 +191,12 @@ def main():
     st.write(unscaled_prophet_prediction)
     predicted_plot(unscaled_prophet_prediction)
     st.write('---')
+    
+    #st.subheader('ARIMA Prediction')
+    #arima_prediction = arima_predict(processed_input_df)
+    #unscaled_arima_prediction = arima_invert_scaling(arima_prediction)
+    #st.write(unscaled_arima_prediction)
+    #Graph
+    #st.write('---')
 
 main()
