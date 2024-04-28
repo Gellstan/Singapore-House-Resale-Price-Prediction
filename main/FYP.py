@@ -47,7 +47,6 @@ def arima_invert_scaling(scaled_predictions):
     reintegrated_forecast = np.cumsum(np.insert(scaled_predictions, 0, last_known_value))[-24:]
     scaled_predictions = np.array(reintegrated_forecast).reshape(-1, 1)
     original_scale_predictions = price_scaler.inverse_transform(scaled_predictions)
-    original_scale_predictions = original_scale_predictions.astype(float)
     return original_scale_predictions
 
 
