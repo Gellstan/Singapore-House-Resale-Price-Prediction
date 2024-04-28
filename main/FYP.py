@@ -58,10 +58,10 @@ def prophet_invert_scaling(scaled_predictions):
         scaled_array = np.array(scaled_predictions).reshape(-1, 1)
 
         # Assuming scaled_predictions is an array of numeric values
-    scaled_array = price_scaler.inverse_transform(scaled_predictions.reshape(-1, 1))
-    scaled_array = scaled_array.astype(float)
+    original_scale_predictions = price_scaler.inverse_transform(scaled_array)
+    original_scale_predictions = original_scale_predictions.astype(float)
     # Convert array back to DataFrame and add necessary columns
-    result_df = pd.DataFrame(scaled_array, columns=['yhat'])
+    result_df = pd.DataFrame(original_scale_predictions, columns=['yhat'])
     result_df['ds'] = pd.date_range(start='your_start_date', periods=len(result_df), freq='M')  # Modify as per your date range
     return result_df
 
