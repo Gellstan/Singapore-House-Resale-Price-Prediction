@@ -7,6 +7,7 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from prophet import Prophet
+import matplotlib.pyplot as plt
 
 origin_data = pd.read_csv('main/Final_data.csv')
 # lstm_model = load_model('main/LSTM_model.h5')
@@ -49,16 +50,20 @@ def arima_invert_scaling(scaled_predictions):
     original_scale_predictions = price_scaler.inverse_transform(scaled_predictions)
     return original_scale_predictions
 
-def invert_scaling(scaled_predictions):
+def prophet_invert_scaling(scaled_predictions):
     if isinstance(scaled_predictions, pd.DataFrame):
         numeric_cols = scaled_predictions.select_dtypes(include=[np.number])
         scaled_array = numeric_cols.values
     else:
         scaled_array = np.array(scaled_predictions).reshape(-1, 1)
 
-    original_scale_predictions = price_scaler.inverse_transform(scaled_array)
-    original_scale_predictions = original_scale_predictions.astype(float)
-    return original_scale_predictions
+        # Assuming scaled_predictions is an array of numeric values
+    scaled_array = price_scaler.inverse_transform(scaled_predictions.reshape(-1, 1))
+    scaled_array = scaled_array.astype(float)
+    # Convert array back to DataFrame and add necessary columns
+    result_df = pd.DataFrame(scaled_array, columns=['yhat'])
+    result_df['ds'] = pd.date_range(start='your_start_date', periods=len(result_df), freq='M')  # Modify as per your date range
+    return result_df
 
 def arima_predict(input_df):
     # Check if 'month' is a column, convert it to datetime, and set it as the index
@@ -90,16 +95,11 @@ def prophet_predict(input_df):
     return prophet_prediction[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
 
 def predicted_plot(unscaled_prophet_prediction):
-    import matplotlib.pyplot as plt
-
-    # Assuming 'monthly_data' has columns 'ds' for date and 'y' for values
     plt.figure(figsize=(10, 6))
-    plt.plot(origin_data['month'], origin_data['resale_price'], label='Historical', color='blue')  # Plot historical data
-    plt.plot(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['yhat'], label='Predicted', color='orange')  # Plot predictions
-    plt.fill_between(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['yhat_lower'], unscaled_prophet_prediction['yhat_upper'], color='gray', alpha=0.2, label='Confidence Interval')
+    plt.plot(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['yhat'], label='Predicted')
+    plt.fill_between(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['yhat_lower'], unscaled_prophet_prediction['yhat_upper'], color='gray', alpha=0.5)  # Adjust lower_bound and upper_bound accordingly
     plt.xlabel('Date')
     plt.ylabel('Value')
-    plt.title('Historical and Predicted Values')
     plt.legend()
     plt.show()
 
@@ -179,7 +179,7 @@ def main():
     
     st.subheader('Prophet Prediction')
     prophet_prediction = prophet_predict(processed_input_df)
-    unscaled_prophet_prediction = invert_scaling(prophet_prediction)
+    unscaled_prophet_prediction = prophet_invert_scaling(prophet_prediction)
     prophet_plot = predicted_plot(unscaled_prophet_prediction)
     st.write(unscaled_prophet_prediction)
     st.write(prophet_plot)
