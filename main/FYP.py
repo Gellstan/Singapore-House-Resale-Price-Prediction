@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 
-
+origin_data = pd.read_csv('Final_data.csv')
 lstm_model = load_model('main/LSTM_model.h5')
 arima_model = pickle.load(open("main/ARIMA_model.pkl", "rb"))
 prophet_model = pickle.load(open("main/Prophet_model.pkl", "rb"))
@@ -75,19 +75,31 @@ def arima_predict(input_df):
     arima_prediction = arima_model.predict(start=input_series.index, end=end)
     return arima_prediction
     
-
-    
 def prophet_predict(input_df):
     # Rename columns as required by Prophet: 'ds' for the date and 'y' for the value
-    if 'month' in input_df.columns:
-        input_df.rename(columns={'month': 'ds'}, inplace=True)
+    from prophet import Prophet
 
-    if 'resale_price' in input_df.columns:
-        input_df.rename(columns={'resale_price': 'y'}, inplace=True)
-
+    # Prepare the DataFrame for Prophet
+    monthly_data = input_df['resale_price'].resample('M').mean()
+    prophet_df = monthly_data.reset_index()
+    prophet_df.columns = ['ds', 'resale_price']
     # The Prophet model expects a DataFrame with at least 'ds' and 'y'
-    prophet_prediction = prophet_model.predict(input_df[['ds', 'y']])
+    prophet_prediction = prophet_model.predict(prophet_df[['ds', 'y']])
     return prophet_prediction[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+
+def predicted_plot(unscaled_prophet_prediction):
+    import matplotlib.pyplot as plt
+
+    # Assuming 'monthly_data' has columns 'ds' for date and 'y' for values
+    plt.figure(figsize=(10, 6))
+    plt.plot(origin_data['month'], origin_data['resale_price'], label='Historical', color='blue')  # Plot historical data
+    plt.plot(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['yhat'], label='Predicted', color='orange')  # Plot predictions
+    plt.fill_between(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['yhat_lower'], unscaled_prophet_prediction['yhat_upper'], color='gray', alpha=0.2, label='Confidence Interval')
+    plt.xlabel('Date')
+    plt.ylabel('Value')
+    plt.title('Historical and Predicted Values')
+    plt.legend()
+    plt.show()
 
 
 def main():
@@ -163,15 +175,12 @@ def main():
     
     st.write('---')
     
-    st.subheader('LSTM Prediction')
-    #Graph
-    
-    st.write('---')
-    
     st.subheader('Prophet Prediction')
     prophet_prediction = prophet_predict(processed_input_df)
     unscaled_prophet_prediction = arima_invert_scaling(prophet_prediction)
+    prophet_plot = predicted_plot(unscaled_prophet_prediction)
     st.write(unscaled_prophet_prediction)
+    st.write(prophet_plot)
     st.write('---')
 
 main()
