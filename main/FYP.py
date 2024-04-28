@@ -97,16 +97,20 @@ def prophet_predict(input_df):
     return prophet_prediction[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
 
 def predicted_plot(unscaled_prophet_prediction):
-    fig, ax = plt.subplots()
-    ax.figure(figsize=(10, 6))
-    plt.plot(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['predicted_value'], label='Predicted')
-    plt.fill_between(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['predicted_value_lower'], unscaled_prophet_prediction['predicted_value_upper'], color='gray', alpha=0.5)  # Adjust lower_bound and upper_bound accordingly
-    plt.xlabel('Date')
-    plt.ylabel('Value')
-    plt.legend()
-    st.set_option('deprecation.showPyplotGlobalUse', False)
-    # Use Streamlit's function to display the plot
+    fig, ax = plt.subplots(figsize=(10, 6))  # Set the figure size here
+    ax.plot(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['predicted_value'], label='Predicted')
+    ax.fill_between(unscaled_prophet_prediction['ds'], 
+                    unscaled_prophet_prediction['predicted_value_lower'], 
+                    unscaled_prophet_prediction['predicted_value_upper'], 
+                    color='gray', alpha=0.5)  # Use the ax object for fill_between
+    
+    ax.set_xlabel('Date')  # Use set_xlabel on ax
+    ax.set_ylabel('Value')  # Use set_ylabel on ax
+    ax.legend()  # Use the legend method of ax
+
+    # Display the plot using Streamlit
     st.pyplot(fig)
+
 
 
 def main():
