@@ -100,9 +100,9 @@ def prophet_predict(input_df):
     end_date = pd.to_datetime('2030-12')
 
     # Calculate the number of months to forecast
-    periods = (end_date.year - input_df['ds'].dt.year[0]) * 12 + end_date.month - input_df['ds'].dt.month[0]
+    periods = (end_date.year - prophet_df['ds'].dt.year[0]) * 12 + end_date.month - prophet_df['ds'].dt.month[0]
 
-    # Generate future dates from the last date available in input_df
+    # Generate future dates from the last date available in prophet_df
     future = prophet_model.make_future_dataframe(periods=periods, freq='M', include_history=True)
 
     # Use the prophet model to predict these future dates
