@@ -88,20 +88,20 @@ def prophet_invert_scaling(scaled_predictions):
     return result_df
     
 def prophet_predict(input_df):
-    # Convert 'ds' to datetime if it's not already
-    if not pd.api.types.is_datetime64_any_dtype(input_df['ds']):
-        input_df['ds'] = pd.to_datetime(input_df['ds'])
-    # Set 'ds' as the index
-    input_df.set_index('ds', inplace=True)
-    # Now resample the 'resale_price'
+
+    if not pd.api.types.is_datetime64_any_dtype(input_df['month']):
+        input_df['month'] = pd.to_datetime(input_df['month'])
+
+    input_df.set_index('month', inplace=True)
     monthly_data = input_df['resale_price'].resample('M').mean()
     prophet_df = monthly_data.reset_index()
     prophet_df.columns = ['ds', 'y']
-    # Continue with your forecasting
+
     future = prophet_model.make_future_dataframe(periods=120, freq='M')
     prophet_prediction = prophet_model.predict(future)
     
     return prophet_prediction[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+
 
 
 def predicted_plot(unscaled_prophet_prediction):
