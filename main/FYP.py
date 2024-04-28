@@ -62,7 +62,7 @@ def prophet_invert_scaling(scaled_predictions):
     original_scale_predictions = original_scale_predictions.astype(float)
     # Convert array back to DataFrame and add necessary columns
     result_df = pd.DataFrame(original_scale_predictions, columns=['predicted_value','predicted_value_lower','predicted_value_upper'])
-    start_date = scaled_predictions['ds'].max() + pd.Timedelta(days=1)
+    start_date = scaled_predictions['ds'].min()
     result_df['ds'] = pd.date_range(start=start_date, periods=result_df.shape[0], freq='M')
     return result_df
 
@@ -91,7 +91,7 @@ def prophet_predict(input_df):
     monthly_data = input_df['resale_price'].resample('M').mean()
     prophet_df = monthly_data.reset_index()
     prophet_df.columns = ['ds', 'y']
-    user_input_date = prophet_df['ds'].max()
+    user_input_date = prophet_df['ds'].min()
     end_date = pd.to_datetime('2030-12')
     periods = (end_date.year - user_input_date.year) * 12 + (end_date.month - user_input_date.month)
     future = prophet_model.make_future_dataframe(periods=periods, freq='M')
