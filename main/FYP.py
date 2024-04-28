@@ -8,6 +8,7 @@ from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from prophet import Prophet
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 origin_data = pd.read_csv('main/Final_data.csv')
 # lstm_model = load_model('main/LSTM_model.h5')
@@ -101,27 +102,30 @@ def prophet_predict(input_df):
     return prophet_prediction[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
 
 def predicted_plot(unscaled_prophet_prediction):
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Ensure the index is a datetime type without timezone issues
     if unscaled_prophet_prediction.index.tz is not None:
         unscaled_prophet_prediction.index = unscaled_prophet_prediction.index.tz_localize(None)
-    fig, ax = plt.subplots(figsize=(10, 6))
-    # Convert dates explicitly to matplotlib's internal representation of dates if needed
-    dates = plt.dates.date2num(unscaled_prophet_prediction.index.to_pydatetime())
+    
+    # Convert dates explicitly to matplotlib's internal representation of dates
+    dates = mdates.date2num(unscaled_prophet_prediction.index.to_pydatetime())
+    
     ax.plot(dates, unscaled_prophet_prediction['predicted_value'], label='Predicted', color='orange')
-    ax.xaxis.set_major_locator(plt.dates.AutoDateLocator())
-    ax.xaxis.set_major_formatter(plt.dates.DateFormatter('%Y-%m-%d'))
-    # Plotting historical data
-    ax.plot(origin_data['month'], origin_data['resale_price'], label='Historical', color='blue')
-    # Plotting predicted data, using index since 'ds' is set as index
-    ax.fill_between(unscaled_prophet_prediction.index, 
+    ax.fill_between(dates, 
                     unscaled_prophet_prediction['predicted_value_lower'], 
                     unscaled_prophet_prediction['predicted_value_upper'], 
                     color='gray', alpha=0.2, label='Confidence Interval')
     
+    ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+
     ax.set_xlabel('Date')
     ax.set_ylabel('Value')
     ax.legend()
 
     st.pyplot(fig)
+
 
 
 
