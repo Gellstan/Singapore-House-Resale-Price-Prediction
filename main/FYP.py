@@ -91,8 +91,8 @@ def prophet_predict(input_df):
     monthly_data = input_df['resale_price'].resample('M').mean()
     prophet_df = monthly_data.reset_index()
     prophet_df.columns = ['ds', 'y']
-    user_input_date = monthly_data['month']
-    end_date = pd.to_datetime('2030-12-01')
+    user_input_date = prophet_df['ds'].max()
+    end_date = pd.to_datetime('2030-12')
     periods = (end_date.year - user_input_date.year) * 12 + (end_date.month - user_input_date.month)
     future = prophet_model.make_future_dataframe(periods=periods, freq='M')
     prophet_prediction = prophet_model.predict(future)
