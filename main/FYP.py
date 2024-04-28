@@ -97,14 +97,13 @@ def prophet_predict(input_df):
     return prophet_prediction[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
 
 def predicted_plot(unscaled_prophet_prediction):
-    plt.figure(figsize=(10, 6))
+    fig, ax = plt.subplots()
+    ax.figure(figsize=(10, 6))
     plt.plot(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['predicted_value'], label='Predicted')
     plt.fill_between(unscaled_prophet_prediction['ds'], unscaled_prophet_prediction['predicted_value_lower'], unscaled_prophet_prediction['predicted_value_upper'], color='gray', alpha=0.5)  # Adjust lower_bound and upper_bound accordingly
     plt.xlabel('Date')
     plt.ylabel('Value')
     plt.legend()
-    fig, ax = plt.subplots()
-    ax.scatter([1, 2, 3], [1, 2, 3])
     st.set_option('deprecation.showPyplotGlobalUse', False)
     # Use Streamlit's function to display the plot
     st.pyplot(fig)
@@ -186,9 +185,8 @@ def main():
     st.subheader('Prophet Prediction')
     prophet_prediction = prophet_predict(processed_input_df)
     unscaled_prophet_prediction = prophet_invert_scaling(prophet_prediction)
-    prophet_plot = predicted_plot(unscaled_prophet_prediction)
     st.write(unscaled_prophet_prediction)
-    st.write(prophet_plot)
+    prophet_plot = predicted_plot(unscaled_prophet_prediction)
     st.write('---')
 
 main()
