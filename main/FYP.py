@@ -10,8 +10,6 @@ from prophet import Prophet
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
-# lstm_model = load_model('main/LSTM_model.h5')
-arima_model = pickle.load(open("main/ARIMA_model.pkl", "rb"))
 prophet_model = pickle.load(open("main/Prophet_model.pkl", "rb"))
 label_encoders_flat_type = pickle.load(open('main/Label_Encoder_Flat_Type.pkl', 'rb'))
 label_encoders_storey_range = pickle.load(open('main/Label_Encoder_Storey_Range.pkl', 'rb'))
