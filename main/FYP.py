@@ -144,21 +144,18 @@ def main():
             lease_commence_date = st.sidebar.slider('Lease Commence Date', 1966, 2019, 1986)
             resale_price = st.sidebar.slider('Resale Price', 5000, 1500000, 275000)
             
-            block = blocklist[0]
-            street_name	= street_name[0]
-            year_population = 4249000
             data = {
                 'month' : month,
                 'town': town,
                 'flat_type': flat_type,
-                'block': block,
-                'street_name': street_name,
+                'block': blocklist[0],
+                'street_name': street_namelist[0],
                 'storey_range': storey_range,
                 'floor_area_sqm': float(floor_area_sqm),
                 'flat_model': flat_model,
                 'lease_commence_date': int(lease_commence_date),
                 'resale_price': float(resale_price),
-                'year_population': int(year_population),
+                'year_population': int(4249000),
                 'have_school': int(have_school),
                 'have_public_transit': int(have_public_transit)
             }
