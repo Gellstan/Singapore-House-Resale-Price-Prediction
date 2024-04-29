@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import pickle
-from tensorflow.keras.models import load_model # type: ignore
 import json
 import numpy as np
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler, OneHotEncoder
