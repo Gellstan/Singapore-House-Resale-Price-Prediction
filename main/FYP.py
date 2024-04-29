@@ -42,33 +42,6 @@ def preprocess_data(input_df):
     input_df[numerical_cols] = minmax_scaler.transform(input_df[numerical_cols])
     
     return input_df
-
-def arima_invert_scaling(scaled_predictions):
-    last_known_value = 0.3629080527602271
-    reintegrated_forecast = np.cumsum(np.insert(scaled_predictions, 0, last_known_value))[-24:]
-    scaled_predictions = np.array(reintegrated_forecast).reshape(-1, 1)
-    original_scale_predictions = price_scaler.inverse_transform(scaled_predictions)
-    return original_scale_predictions
-
-def arima_predict(input_df):
-    # Check if 'month' is a column, convert it to datetime, and set it as the index
-    if 'month' in input_df.columns:
-        input_df.set_index('month', inplace=True)
-    
-    # Extract the 'resale_price' series
-    if 'resale_price' in input_df.columns:
-        input_series = input_df['resale_price']
-    else:
-        raise ValueError("resale_price column is missing from the input DataFrame.")
-
-    # Ensure that the index is properly formatted as datetime
-    if not isinstance(input_series.index, pd.DatetimeIndex):
-        raise TypeError("Index is not a datetime type, which is required for ARIMA predictions.")
-
-    # Perform prediction using the ARIMA model
-    end = '2030-12'
-    arima_prediction = arima_model.predict(start=input_series.index, end=end)
-    return arima_prediction
     
 def prophet_invert_scaling(scaled_predictions):
     if isinstance(scaled_predictions, pd.DataFrame):
@@ -107,8 +80,6 @@ def prophet_predict(input_df):
     forecast = prophet_model.predict(future)
     
     return forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
-
-
 
 def predicted_plot(unscaled_prophet_prediction):
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -204,13 +175,6 @@ def main():
     unscaled_prophet_prediction = prophet_invert_scaling(prophet_prediction)
     st.write(unscaled_prophet_prediction)
     predicted_plot(unscaled_prophet_prediction)
-    st.write('---')
-    
-    #st.subheader('ARIMA Prediction')
-    #arima_prediction = arima_predict(processed_input_df)
-    #unscaled_arima_prediction = arima_invert_scaling(arima_prediction)
-    #st.write(unscaled_arima_prediction)
-    #Graph
-    #st.write('---')
+
 
 main()
