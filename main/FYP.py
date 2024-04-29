@@ -163,9 +163,10 @@ def main():
             features['month'] = pd.to_datetime(features['month'], errors='coerce')
             return features
         input_df = user_input_features()
+        user_input = input_df[['town','flat_type','storey_range','floor_area_sqm','flat_model','lease_commence_date','have_school','have_public_transit','resale_price']]
 
     st.subheader('User Input parameters')
-    st.write(input_df['town','flat_type','storey_range','floor_area_sqm','flat_model','lease_commence_date','have_school','have_public_transit','resale_price'])
+    st.write(user_input)
     st.write('---')
     
     st.subheader('Prophet Prediction')
