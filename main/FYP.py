@@ -9,6 +9,7 @@ from prophet import Prophet
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
+origin_data = pd.read_csv('main/Final_data.csv')
 prophet_model = pickle.load(open("main/Prophet_model.pkl", "rb"))
 label_encoders_flat_type = pickle.load(open('main/Label_Encoder_Flat_Type.pkl', 'rb'))
 label_encoders_storey_range = pickle.load(open('main/Label_Encoder_Storey_Range.pkl', 'rb'))
@@ -24,6 +25,11 @@ blocklist = data_columns['block']
 street_namelist = data_columns['street_name']
 storey_rangelist = data_columns['storey_range']
 flat_modellist = data_columns['flat_model']
+
+origin_data['month'] = pd.to_datetime(origin_data['month'])
+origin_data.set_index('month', inplace=True)
+origin_data = origin_data['resale_price'].resample('M').mean()
+origin_data = origin_data.reset_index()
 
 def preprocess_data(input_df):  
     # One-hot encode categorical columns
@@ -102,7 +108,6 @@ def predicted_plot(unscaled_prophet_prediction):
 
     st.pyplot(fig)
 
-
 def main():
     st.write("""
     # Singapore House Resale Price Prediction
@@ -127,8 +132,6 @@ def main():
             month = st.sidebar.select_slider('Month', monthlist)
             town = st.sidebar.selectbox('Town', townlist)
             flat_type = st.sidebar.selectbox('Flat Type', flat_typelist) 
-            block = st.sidebar.selectbox('Block', blocklist)
-            street_name	= st.sidebar.selectbox('Street Name', street_namelist)
             storey_range = st.sidebar.selectbox('Storey Range', storey_rangelist)
             flat_model = st.sidebar.selectbox('Flat Model', flat_modellist)
             
@@ -140,8 +143,10 @@ def main():
             floor_area_sqm = st.sidebar.slider('Floor Area(sqm)', 28, 307, 95)
             lease_commence_date = st.sidebar.slider('Lease Commence Date', 1966, 2019, 1986)
             resale_price = st.sidebar.slider('Resale Price', 5000, 1500000, 275000)
-            year_population	= st.sidebar.slider('Year Population', 3000000, 6000000, 4250000)
             
+            block = blocklist[0]
+            street_name	= street_name[0]
+            year_population = 4249000
             data = {
                 'month' : month,
                 'town': town,
@@ -163,7 +168,7 @@ def main():
         input_df = user_input_features()
 
     st.subheader('User Input parameters')
-    st.write(input_df)
+    st.write(input_df['town','flat_type','storey_range','floor_area_sqm','flat_model','lease_commence_date','have_school','have_public_transit','resale_price'])
     st.write('---')
     
     st.subheader('Prophet Prediction')
