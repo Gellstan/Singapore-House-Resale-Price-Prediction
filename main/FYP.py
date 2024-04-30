@@ -125,7 +125,7 @@ def prophet_evaluation(unscaled_prophet_prediction):
     test_data = test_data['resale_price'].resample('M').mean()
     test_data = test_data.reset_index()
     
-    predicted_prophet = unscaled_prophet_prediction['yhat'][:-122].values
+    predicted_prophet = unscaled_prophet_prediction['yhat'][:-123].values
     actual_prophet = test_data.values
     mae_prophet = mean_absolute_error(actual_prophet, predicted_prophet)
     rmse_prophet = np.sqrt(mean_squared_error(actual_prophet, predicted_prophet))
