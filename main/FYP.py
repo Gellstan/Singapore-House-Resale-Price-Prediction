@@ -8,6 +8,7 @@ from sklearn.compose import ColumnTransformer
 from prophet import Prophet
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 origin_data = pd.read_csv('main/Final_data.csv')
 prophet_model = pickle.load(open("main/Prophet_model.pkl", "rb"))
@@ -108,6 +109,23 @@ def predicted_plot(unscaled_prophet_prediction):
 
     st.pyplot(fig)
 
+def prophet_evaluation(unscaled_prophet_prediction):
+    test_data = preprocess_data(origin_data)
+    predicted_prophet = unscaled_prophet_prediction['yhat'][:-120].values
+    actual_prophet = test_data.values
+    mae_prophet = mean_absolute_error(actual_prophet, predicted_prophet)
+    rmse_prophet = np.sqrt(mean_squared_error(actual_prophet, predicted_prophet))
+    mape_prophet = np.mean(np.abs((actual_prophet - predicted_prophet) / actual_prophet)) * 100
+    r_squared_prophet = r2_score(actual_prophet, predicted_prophet)
+    metrics = {
+        'MAE': mae_prophet,
+        'RMSE': rmse_prophet,
+        'MAPE': mape_prophet/100,
+        'R-squared': r_squared_prophet
+    }
+    
+    return metrics
+
 def main():
     st.write("""
     # Singapore House Resale Price Prediction
@@ -175,6 +193,8 @@ def main():
     unscaled_prophet_prediction = prophet_invert_scaling(prophet_prediction)
     st.write(unscaled_prophet_prediction)
     predicted_plot(unscaled_prophet_prediction)
+    prophet_evaluation_metrics = prophet_evaluation(unscaled_prophet_prediction)
+    st.write(prophet_evaluation_metrics)
 
 
 main()
