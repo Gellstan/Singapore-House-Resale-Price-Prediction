@@ -27,6 +27,22 @@ street_namelist = data_columns['street_name']
 storey_rangelist = data_columns['storey_range']
 flat_modellist = data_columns['flat_model']
 
+def process_original_data(original_data):
+    original_data['month'] = pd.to_datetime(original_data['month'])
+    original_data = original_data.drop_duplicates()
+    original_data.set_index('month', inplace=True)
+    data_encoded = pd.get_dummies(original_data, columns=['town'], sparse=True)
+    data_encoded = pd.get_dummies(data_encoded , columns=['block'], sparse=True)
+    data_encoded = pd.get_dummies(data_encoded , columns=['street_name'], sparse=True)
+    data_encoded = pd.get_dummies(data_encoded , columns=['flat_model'], sparse=True)
+    data_encoded['flat_type_encoded'] = label_encoders_flat_type.fit_transform(data_encoded['flat_type'])
+    data_encoded['storey_range_encoded'] = label_encoders_storey_range.fit_transform(data_encoded['storey_range'])
+    numerical_columns = ['floor_area_sqm', 'lease_commence_date', 'resale_price', 'year_population']
+    data_encoded[numerical_columns] = minmax_scaler.fit_transform(data_encoded[numerical_columns])
+    
+    return data_encoded
+
+
 def preprocess_data(input_df):  
     # One-hot encode categorical columns
     categorical_cols = ['town', 'block', 'street_name', 'flat_model']
@@ -105,9 +121,9 @@ def predicted_plot(unscaled_prophet_prediction):
     st.pyplot(fig)
 
 def prophet_evaluation(unscaled_prophet_prediction):
-    test_data = preprocess_data(origin_data)
-    origin_data = origin_data['resale_price'].resample('M').mean()
-    origin_data = origin_data.reset_index()
+    test_data = process_original_data(origin_data)
+    test_data = test_data['resale_price'].resample('M').mean()
+    test_data = test_data.reset_index()
     
     predicted_prophet = unscaled_prophet_prediction['yhat'][:-120].values
     actual_prophet = test_data.values
