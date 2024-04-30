@@ -130,7 +130,7 @@ def main():
     st.write("""
     # Singapore House Resale Price Prediction
     
-    Predict singapore house resale price with ARIMA, LSTM, and Prophet!
+    Predict singapore house resale price with Prophet model.
     
     """)
 
@@ -145,6 +145,7 @@ def main():
         input_data = st.file_uploader("Upload your data", type=["csv"])
         if input_data is not None:
             input_df = pd.read_csv(input_data)
+            user_input = input_df[['town','flat_type','storey_range','floor_area_sqm','flat_model','lease_commence_date','have_school','have_public_transit','resale_price']]
     else:
         def user_input_features():
             st.sidebar.write('If you do not want to update files, Please Adjust the below variable.')
@@ -194,6 +195,8 @@ def main():
     unscaled_prophet_prediction = prophet_invert_scaling(prophet_prediction)
     st.write(unscaled_prophet_prediction)
     predicted_plot(unscaled_prophet_prediction)
+    st.write('---')
+    st.subheader('Prophet Overall Evaluation')
     st.write(prophet_evaluation_file)
     prophet_evaluation_plot(prophet_evaluation_file)
 
