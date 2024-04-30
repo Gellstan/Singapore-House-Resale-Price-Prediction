@@ -109,16 +109,13 @@ def prophet_evaluation_plot(metrics):
     ax = metrics.plot.bar(rot=0, color='skyblue', legend=False, figsize=(8, 4))
     ax.set_ylabel('Score')
     ax.set_title('Performance Metrics of Prophet Model')
-    ax.set_ylim(0, metrics.max().max() + (0.1 * metrics.max().max()))  # Adjust y-limit for better visual
+    ax.set_ylim(0, metrics.max().max() + (0.1 * metrics.max().max())) 
 
     # Adding text labels above bars
-    for p in ax.patches:
-        ax.annotate(f"{p.get_height():.2f}", (p.get_x() + p.get_width() / 2., p.get_height()),
-                    ha='center', va='center', xytext=(0, 10), textcoords='offset points')
+    for i, v in enumerate(metrics.values()):
+        ax.text(i, v + 0.02, f"{v:.2f}", ha='center', va='bottom')
 
     st.pyplot(fig)
-
-
 
 
 def main():
