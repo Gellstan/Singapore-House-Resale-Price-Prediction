@@ -111,6 +111,7 @@ def prophet_evaluation_plot(metrics):
     ax.set_title('Performance Metrics of Prophet Model')
     ax.set_ylim(0, metrics.max().max() + (0.1 * metrics.max().max())) 
 
+    metrics = metrics.transpose()
     # Adding text labels above bars
     for i, v in enumerate(metrics.values()):
         ax.text(i, v + 0.02, f"{v:.2f}", ha='center', va='bottom')
