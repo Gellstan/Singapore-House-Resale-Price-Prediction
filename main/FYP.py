@@ -105,13 +105,14 @@ def predicted_plot(unscaled_prophet_prediction):
     st.pyplot(fig)
 
 def prophet_evaluation_plot(metrics):
+    transposed_metrics = metrics.transpose()
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.bar(metrics.keys(), metrics.values(), color='skyblue')
+    ax.bar(transposed_metrics.keys(), transposed_metrics.values(), color='skyblue')
     ax.set_ylabel('Score')
     ax.set_title('Performance Metrics of Prophet Model')
-    ax.set_ylim(0, max(metrics.values()) + (0.1 * max(metrics.values())))  # Adjust y-limit for better visual
+    ax.set_ylim(0, max(transposed_metrics.values()) + (0.1 * max(transposed_metrics.values())))  # Adjust y-limit for better visual
 
-    for i, v in enumerate(metrics.values()):
+    for i, v in enumerate(transposed_metrics.values()):
         ax.text(i, v + 0.02, f"{v:.2f}", ha='center', va='bottom')
 
     st.pyplot(fig)
