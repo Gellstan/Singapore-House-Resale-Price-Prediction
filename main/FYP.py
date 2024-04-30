@@ -120,26 +120,32 @@ def predicted_plot(unscaled_prophet_prediction):
 
     st.pyplot(fig)
 
-def prophet_evaluation(unscaled_prophet_prediction):
+def prophet_evaluation(prophet_prediction):
     test_data = process_original_data(origin_data)
     test_data = test_data['resale_price'].resample('M').mean()
     test_data = test_data.reset_index()
-    
-    
-    predicted_prophet = unscaled_prophet_prediction['yhat'][:-123].values
-    predicted_prophet = predicted_prophet.reset_index()
-    actual_prophet = test_data.values
+
+    # Ensure we are comparing like types
+    predicted_prophet = prophet_prediction['yhat'][:-123].reset_index(drop=True)
+    actual_prophet = test_data['resale_price']
+
+    # Convert to numpy arrays to ensure compatibility with error functions
+    predicted_prophet = predicted_prophet.values.astype(float)
+    actual_prophet = actual_prophet.values.astype(float)
+
+    # Calculate error metrics
     mae_prophet = mean_absolute_error(actual_prophet, predicted_prophet)
     rmse_prophet = np.sqrt(mean_squared_error(actual_prophet, predicted_prophet))
     mape_prophet = np.mean(np.abs((actual_prophet - predicted_prophet) / actual_prophet)) * 100
     r_squared_prophet = r2_score(actual_prophet, predicted_prophet)
-    metrics =  pd.DataFrame({
-        'MAE': mae_prophet,
-        'RMSE': rmse_prophet,
-        'MAPE': mape_prophet/100,
-        'R-squared': r_squared_prophet
-    })
     
+    metrics = pd.DataFrame({
+        'MAE': [mae_prophet],
+        'RMSE': [rmse_prophet],
+        'MAPE': [mape_prophet / 100],
+        'R-squared': [r_squared_prophet]
+    })
+
     return metrics
 
 def main():
