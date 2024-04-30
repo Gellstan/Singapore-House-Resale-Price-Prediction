@@ -122,16 +122,14 @@ def predicted_plot(unscaled_prophet_prediction):
 
 def prophet_evaluation(prophet_prediction):
     test_data = process_original_data(origin_data)
-    test_data = test_data['resale_price'].resample('M').mean()
-    test_data = test_data.reset_index()
+    # Resampling and ensuring numerical values are isolated
+    test_data = test_data['resale_price'].resample('M').mean().reset_index()
 
-    # Ensure we are comparing like types
+    # Extract numerical data correctly
     predicted_prophet = prophet_prediction['yhat'][:-123].reset_index(drop=True)
-    actual_prophet = test_data
+    actual_prophet = test_data['resale_price']
 
-    st.write(predicted_prophet.head())
-    st.write(actual_prophet.head())
-    # Convert to numpy arrays to ensure compatibility with error functions
+    # Ensure both arrays are of type float for calculation
     predicted_prophet = predicted_prophet.values.astype(float)
     actual_prophet = actual_prophet.values.astype(float)
 
@@ -140,7 +138,7 @@ def prophet_evaluation(prophet_prediction):
     rmse_prophet = np.sqrt(mean_squared_error(actual_prophet, predicted_prophet))
     mape_prophet = np.mean(np.abs((actual_prophet - predicted_prophet) / actual_prophet)) * 100
     r_squared_prophet = r2_score(actual_prophet, predicted_prophet)
-    
+
     metrics = pd.DataFrame({
         'MAE': [mae_prophet],
         'RMSE': [rmse_prophet],
@@ -149,6 +147,7 @@ def prophet_evaluation(prophet_prediction):
     })
 
     return metrics
+
 
 def main():
     st.write("""
