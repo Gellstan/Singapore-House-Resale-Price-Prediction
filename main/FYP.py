@@ -10,12 +10,12 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-origin_data = pd.read_csv('main/Final_data.csv')
 prophet_model = pickle.load(open("main/Prophet_model.pkl", "rb"))
 label_encoders_flat_type = pickle.load(open('main/Label_Encoder_Flat_Type.pkl', 'rb'))
 label_encoders_storey_range = pickle.load(open('main/Label_Encoder_Storey_Range.pkl', 'rb'))
 minmax_scaler = pickle.load(open('main/Scaler.pkl', 'rb'))
 price_scaler = pickle.load(open('main/Scaler_ARIMA.pkl', 'rb'))
+prophet_evaluation_file = pd.read_csv("main/Prophet_Metrics.csv")
 
 feature_var = json.load(open("main/columns_unique.json"))
 data_columns = feature_var['data_columns']
@@ -26,22 +26,6 @@ blocklist = data_columns['block']
 street_namelist = data_columns['street_name']
 storey_rangelist = data_columns['storey_range']
 flat_modellist = data_columns['flat_model']
-
-def process_original_data(original_data):
-    original_data['month'] = pd.to_datetime(original_data['month'])
-    original_data = original_data.drop_duplicates()
-    original_data.set_index('month', inplace=True)
-    data_encoded = pd.get_dummies(original_data, columns=['town'], sparse=True)
-    data_encoded = pd.get_dummies(data_encoded , columns=['block'], sparse=True)
-    data_encoded = pd.get_dummies(data_encoded , columns=['street_name'], sparse=True)
-    data_encoded = pd.get_dummies(data_encoded , columns=['flat_model'], sparse=True)
-    data_encoded['flat_type_encoded'] = label_encoders_flat_type.fit_transform(data_encoded['flat_type'])
-    data_encoded['storey_range_encoded'] = label_encoders_storey_range.fit_transform(data_encoded['storey_range'])
-    numerical_columns = ['floor_area_sqm', 'lease_commence_date', 'resale_price', 'year_population']
-    data_encoded[numerical_columns] = minmax_scaler.fit_transform(data_encoded[numerical_columns])
-    
-    return data_encoded
-
 
 def preprocess_data(input_df):  
     # One-hot encode categorical columns
@@ -120,38 +104,18 @@ def predicted_plot(unscaled_prophet_prediction):
 
     st.pyplot(fig)
 
-def prophet_evaluation(prophet_prediction):
-    # Process original data and reset index to make sure no date columns are included in numeric calculations
-    test_data = process_original_data(origin_data)
-    test_data = test_data['resale_price'].resample('M').mean().reset_index()
-    test_data = test_data['resale_price']  # Ensure this column only has numeric values
+def prophet_evaluation_plot(metrics):
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.bar(metrics.keys(), metrics.values(), color='skyblue')
+    ax.set_ylabel('Score')
+    ax.set_title('Performance Metrics of Prophet Model')
+    ax.set_ylim(0, max(metrics.values()) + (0.1 * max(metrics.values())))  # Adjust y-limit for better visual
 
-    # Extract predictions while making sure no date indices are passed to metric calculations
-    predicted_prophet = prophet_prediction['yhat'][:-123].reset_index(drop=True)
+    for i, v in enumerate(metrics.values()):
+        ax.text(i, v + 0.02, f"{v:.2f}", ha='center', va='bottom')
 
-    # Ensure that both arrays are floats and contain no NaNs
-    predicted_prophet = predicted_prophet.dropna().values.astype(float)
-    actual_prophet = test_data.dropna().values.astype(float)
+    st.pyplot(fig)
 
-    # Verify lengths match after dropping NaNs
-    if len(predicted_prophet) != len(actual_prophet):
-        st.error("Predicted and actual data lengths do not match. Please check data alignment.")
-        return pd.DataFrame()  # Return an empty DataFrame to avoid further errors
-
-    # Calculate metrics
-    mae_prophet = mean_absolute_error(actual_prophet, predicted_prophet)
-    rmse_prophet = np.sqrt(mean_squared_error(actual_prophet, predicted_prophet))
-    mape_prophet = np.mean(np.abs((actual_prophet - predicted_prophet) / actual_prophet)) * 100
-    r_squared_prophet = r2_score(actual_prophet, predicted_prophet)
-
-    metrics = pd.DataFrame({
-        'MAE': [mae_prophet],
-        'RMSE': [rmse_prophet],
-        'MAPE': [mape_prophet / 100],
-        'R-squared': [r_squared_prophet]
-    })
-
-    return metrics
 
 
 
@@ -222,8 +186,9 @@ def main():
     unscaled_prophet_prediction = prophet_invert_scaling(prophet_prediction)
     st.write(unscaled_prophet_prediction)
     predicted_plot(unscaled_prophet_prediction)
-    prophet_evaluation_metrics = prophet_evaluation(prophet_prediction)
-    st.write(prophet_evaluation_metrics)
+    st.write(prophet_evaluation_file)
+    prophet_evaluation_plot(prophet_evaluation_file)
+
 
 
 main()
