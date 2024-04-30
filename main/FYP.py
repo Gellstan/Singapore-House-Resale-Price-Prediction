@@ -129,8 +129,8 @@ def prophet_evaluation(prophet_prediction):
     predicted_prophet = prophet_prediction['yhat'][:-123].reset_index(drop=True)
     actual_prophet = test_data
 
-    predicted_prophet.head()
-    actual_prophet.head()
+    st.write(predicted_prophet.head())
+    st.write(actual_prophet.head())
     # Convert to numpy arrays to ensure compatibility with error functions
     predicted_prophet = predicted_prophet.values.astype(float)
     actual_prophet = actual_prophet.values.astype(float)
