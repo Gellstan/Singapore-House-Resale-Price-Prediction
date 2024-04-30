@@ -121,19 +121,24 @@ def predicted_plot(unscaled_prophet_prediction):
     st.pyplot(fig)
 
 def prophet_evaluation(prophet_prediction):
+    # Process original data and reset index to make sure no date columns are included in numeric calculations
     test_data = process_original_data(origin_data)
-    # Resampling and ensuring numerical values are isolated
     test_data = test_data['resale_price'].resample('M').mean().reset_index()
+    test_data = test_data['resale_price']  # Ensure this column only has numeric values
 
-    # Extract numerical data correctly
+    # Extract predictions while making sure no date indices are passed to metric calculations
     predicted_prophet = prophet_prediction['yhat'][:-123].reset_index(drop=True)
-    actual_prophet = test_data['resale_price']
 
-    # Ensure both arrays are of type float for calculation
-    predicted_prophet = predicted_prophet.values.astype(float)
-    actual_prophet = actual_prophet.values.astype(float)
+    # Ensure that both arrays are floats and contain no NaNs
+    predicted_prophet = predicted_prophet.dropna().values.astype(float)
+    actual_prophet = test_data.dropna().values.astype(float)
 
-    # Calculate error metrics
+    # Verify lengths match after dropping NaNs
+    if len(predicted_prophet) != len(actual_prophet):
+        st.error("Predicted and actual data lengths do not match. Please check data alignment.")
+        return pd.DataFrame()  # Return an empty DataFrame to avoid further errors
+
+    # Calculate metrics
     mae_prophet = mean_absolute_error(actual_prophet, predicted_prophet)
     rmse_prophet = np.sqrt(mean_squared_error(actual_prophet, predicted_prophet))
     mape_prophet = np.mean(np.abs((actual_prophet - predicted_prophet) / actual_prophet)) * 100
@@ -147,6 +152,7 @@ def prophet_evaluation(prophet_prediction):
     })
 
     return metrics
+
 
 
 def main():
