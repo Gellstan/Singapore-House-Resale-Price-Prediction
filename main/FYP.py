@@ -147,6 +147,7 @@ def main():
             input_df = pd.read_csv(input_data)
     else:
         def user_input_features():
+            st.sidebar.write('If you do not want to update files, Please Adjust the below variable.')
             month = st.sidebar.select_slider('Month', monthlist)
             town = st.sidebar.selectbox('Town', townlist)
             flat_type = st.sidebar.selectbox('Flat Type', flat_typelist) 
