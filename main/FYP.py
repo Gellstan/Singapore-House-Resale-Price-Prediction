@@ -207,7 +207,7 @@ def main():
     unscaled_prophet_prediction = prophet_invert_scaling(prophet_prediction)
     st.write(unscaled_prophet_prediction)
     predicted_plot(unscaled_prophet_prediction)
-    prophet_evaluation_metrics = prophet_evaluation(unscaled_prophet_prediction)
+    prophet_evaluation_metrics = prophet_evaluation(prophet_prediction)
     st.write(prophet_evaluation_metrics)
 
 
