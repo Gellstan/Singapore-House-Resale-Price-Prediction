@@ -117,12 +117,12 @@ def prophet_evaluation(unscaled_prophet_prediction):
     rmse_prophet = np.sqrt(mean_squared_error(actual_prophet, predicted_prophet))
     mape_prophet = np.mean(np.abs((actual_prophet - predicted_prophet) / actual_prophet)) * 100
     r_squared_prophet = r2_score(actual_prophet, predicted_prophet)
-    metrics = {
+    metrics =  pd.DataFrame({
         'MAE': mae_prophet,
         'RMSE': rmse_prophet,
         'MAPE': mape_prophet/100,
         'R-squared': r_squared_prophet
-    }
+    })
     
     return metrics
 
