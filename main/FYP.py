@@ -27,11 +27,6 @@ street_namelist = data_columns['street_name']
 storey_rangelist = data_columns['storey_range']
 flat_modellist = data_columns['flat_model']
 
-origin_data['month'] = pd.to_datetime(origin_data['month'])
-origin_data.set_index('month', inplace=True)
-origin_data = origin_data['resale_price'].resample('M').mean()
-origin_data = origin_data.reset_index()
-
 def preprocess_data(input_df):  
     # One-hot encode categorical columns
     categorical_cols = ['town', 'block', 'street_name', 'flat_model']
@@ -111,6 +106,9 @@ def predicted_plot(unscaled_prophet_prediction):
 
 def prophet_evaluation(unscaled_prophet_prediction):
     test_data = preprocess_data(origin_data)
+    origin_data = origin_data['resale_price'].resample('M').mean()
+    origin_data = origin_data.reset_index()
+    
     predicted_prophet = unscaled_prophet_prediction['yhat'][:-120].values
     actual_prophet = test_data.values
     mae_prophet = mean_absolute_error(actual_prophet, predicted_prophet)
