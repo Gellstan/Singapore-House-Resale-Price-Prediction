@@ -105,16 +105,23 @@ def predicted_plot(unscaled_prophet_prediction):
     st.pyplot(fig)
 
 def prophet_evaluation_plot(metrics):
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax = metrics.plot.bar(rot=0, color='skyblue', legend=False, figsize=(8, 4))
+    metrics_values = metrics.iloc[0].values  # Extracting values from the first row
+    metrics_names = metrics.columns.tolist()  # Extracting metric names
+
+    # Creating the bar plot
+    fig, ax = plt.subplots()
+    ax.bar(metrics_names, metrics_values, color='skyblue')
+
+    # Set the labels and titles
     ax.set_ylabel('Score')
     ax.set_title('Performance Metrics of Prophet Model')
-    ax.set_ylim(0, metrics.max().max() + (0.1 * metrics.max().max())) 
 
-    metrics = metrics.transpose()
-    # Adding text labels above bars
-    for i, v in enumerate(metrics.values()):
-        ax.text(i, v + 0.02, f"{v:.2f}", ha='center', va='bottom')
+    # Optionally, set the ylim based on your maximum metric value
+    ax.set_ylim(0, max(metrics_values) + 0.1 * max(metrics_values))
+
+    # Adding numeric labels above each bar for better readability
+    for i, v in enumerate(metrics_values):
+        ax.text(i, v + max(metrics_values) * 0.02, f"{v:.4f}", ha='center', va='bottom')
 
     st.pyplot(fig)
 
