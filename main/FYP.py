@@ -145,7 +145,7 @@ def main():
         input_data = st.file_uploader("Upload your data", type=["csv"])
         if input_data is not None:
             input_df = pd.read_csv(input_data)
-            user_input = input_df[['town','flat_type','storey_range','floor_area_sqm','flat_model','lease_commence_date','have_school','have_public_transit','resale_price']]
+            user_input = input_df[['town','flat_type','storey_range','floor_area_sqm','flat_model','lease_commence_date','have_school','have_public_transit']]
     else:
         def user_input_features():
             st.sidebar.write('If you do not want to update files, Please Adjust the below variable.')
@@ -162,7 +162,6 @@ def main():
             
             floor_area_sqm = st.sidebar.slider('Floor Area(sqm)', 28, 307, 95)
             lease_commence_date = st.sidebar.slider('Lease Commence Date', 1966, 2019, 1986)
-            resale_price = st.sidebar.slider('Resale Price', 5000, 1500000, 275000)
             
             data = {
                 'month' : month,
@@ -174,7 +173,7 @@ def main():
                 'floor_area_sqm': float(floor_area_sqm),
                 'flat_model': flat_model,
                 'lease_commence_date': int(lease_commence_date),
-                'resale_price': float(resale_price),
+                'resale_price': float(275000),
                 'year_population': int(4249000),
                 'have_school': int(have_school),
                 'have_public_transit': int(have_public_transit)
@@ -183,7 +182,7 @@ def main():
             features['month'] = pd.to_datetime(features['month'], errors='coerce')
             return features
         input_df = user_input_features()
-        user_input = input_df[['town','flat_type','storey_range','floor_area_sqm','flat_model','lease_commence_date','have_school','have_public_transit','resale_price']]
+        user_input = input_df[['town','flat_type','storey_range','floor_area_sqm','flat_model','lease_commence_date','have_school','have_public_transit']]
 
     st.subheader('User Input parameters')
     st.write(user_input)
